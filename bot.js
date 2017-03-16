@@ -86,17 +86,21 @@ function receivedMessage(event) {
   if (messageText) {
     // If we receive a text message, check to see if it matches a keyword
     // and send back the template example. Otherwise, just echo the text we received.
-    switch (messageText) {
-      case 'meme':
-        sendMeme(senderID);
-        break;
-
-      default:
-        sendApiDescription(senderID);
-    }
-  } else if (messageAttachments) {
-    //sendTextMessage(senderID, "Message with attachment received");
+    if(textMatches(messageText, "meme"))
+      sendMeme(senderID);
+    else if(textMatches(messageText, "help"))
+      sendHelp(senderID);
+    else if(textMatches(messageText, "why"))
+      sendWhy(senderID);
+    else if(textMatches(messageText, "how"))
+      sendHow(senderID);
+    else
+      sendWelcome(senderID);
   }
+}
+
+function textMatches(message, matchString) {
+  return message.toLowerCase().indexOf(matchString) != -1;
 }
 
 //////////////////////////
@@ -104,8 +108,6 @@ function receivedMessage(event) {
 //////////////////////////
 
 function sendTextMessage(recipientId, messageText) {
-  request()
-  
   var messageData = {
     recipient: {
       id: recipientId
@@ -122,9 +124,29 @@ function logObject(obj) {
   console.log(JSON.stringify(obj, null, 2));
 }
 
-function sendApiDescription(recipientId) {
-  sendTextMessage(recipientId, "sssss");
-  return;
+function sendWhy(recipientId) {
+  var sendMsg = `why the hell not mate?!`;
+  sendTextMessage(recipientId, sendMsg);
+}
+
+function sendHow(recipientId) {
+  var sendMsg = `
+  Here's how I work!
+  https://github.com/benwinding/Messenger-Meme-Bot
+`;
+  sendTextMessage(recipientId, sendMsg);
+}
+
+function sendHelp(recipientId) {
+  var apiDesc = `I'm glad you asked ( ͡° ͜ʖ ͡°), 
+meme = sends a random meme image found on imgur.com
+help = sends this message ...
+why = sends the reason why I exist!
+  `;
+  sendTextMessage(recipientId, apiDesc);
+}
+
+function sendWelcome(recipientId) {
   request({
       url: 'https://graph.facebook.com/v2.6/' + recipientId 
         + '?access_token=' + process.env.PAGE_ACCESS_TOKEN
@@ -134,12 +156,13 @@ function sendApiDescription(recipientId) {
     
       var fbProfileBody = JSON.parse(body);
       var userName = fbProfileBody["first_name"];
-      var apiDesc = `Hello ${userName}, 
-        I'm your personal memebot! ¯\_(ツ)_/¯
-        type 'meme' and see what happens...
-        (type help for more details)
+      var welcomeMsg = `Hello ${userName}, 
+I'm your personal memebot! 
+type 'meme' and see what happens... 
+¯\\_(ツ)_/¯ 
+or 'help' for more details
       `;
-      sendTextMessage(recipientId, "sssss");
+      sendTextMessage(recipientId, welcomeMsg);
     }
   );
 }
