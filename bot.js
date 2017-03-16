@@ -88,6 +88,8 @@ function receivedMessage(event) {
     // and send back the template example. Otherwise, just echo the text we received.
     if(textMatches(messageText, "meme test"))
       sendMemeTEST(senderID, messageText);
+    else if(textMatches(messageText, "meme time"))
+      sendTimeReminder(senderID);
     else if(textMatches(messageText, "meme day"))
       sendMemeDay(senderID);
     else if(textMatches(messageText, "meme week"))
@@ -98,6 +100,8 @@ function receivedMessage(event) {
       sendMemeYear(senderID);
     else if(textMatches(messageText, "meme all"))
       sendMeme(senderID);
+    else if(textMatches(messageText, "meme dank"))
+      sendMemeDank(senderID);
     else if(textMatches(messageText, "meme"))
       sendMeme(senderID);
     else if(textMatches(messageText, "help"))
@@ -140,6 +144,16 @@ function logObject(obj) {
   console.log(JSON.stringify(obj, null, 2));
 }
 
+function sendTimeReminder(recipientId) {
+  var sendMsg = `Instead of typing:
+meme time
+ write
+meme day
+ or week,year,all,dank
+`;
+  sendTextMessage(recipientId, sendMsg);
+}
+
 function sendWhy(recipientId) {
   var sendMsg = `why the hell not mate?!`;
   sendTextMessage(recipientId, sendMsg);
@@ -157,13 +171,9 @@ https://github.com/benwinding/Messenger-Meme-Bot
 
 function sendHelp(recipientId) {
   var apiDesc = `( ͡° ͜ʖ ͡°) Below are my commands:
-
 meme = random meme ;)
-
-meme day = meme from day
-meme week = meme from week
-meme month = meme from month
-meme year = meme from year
+meme dank = dank meme
+meme time = meme from day|week|month|year
 
 help = this...
 why = ??
@@ -171,6 +181,7 @@ how = source code link
 random = sends really random image
 
 Careful, you could get anything with memebot...
+
 (Ben Winding 2017)
   `;
   sendTextMessage(recipientId, apiDesc);
@@ -197,8 +208,12 @@ or 'help' for more details.
   );
 }
 
+function sendMemeDank(recipientId) {
+  sendMemeFunction(recipientId, 'day', 0, 10);
+}
+
 function sendMeme(recipientId) {
-  sendMemeFunction(recipientId, 'all', 5, 60);
+  sendMemeFunction(recipientId, 'all', 3, 60);
 }
 
 function sendMemeDay(recipientId) {
@@ -210,11 +225,11 @@ function sendMemeWeek(recipientId) {
 }
 
 function sendMemeMonth(recipientId) {
-  sendMemeFunction(recipientId, 'month', 5, 60);
+  sendMemeFunction(recipientId, 'month', 3, 60);
 }
 
 function sendMemeYear(recipientId) {
-  sendMemeFunction(recipientId, 'year', 6, 60);
+  sendMemeFunction(recipientId, 'year', 4, 60);
 }
 
 function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
