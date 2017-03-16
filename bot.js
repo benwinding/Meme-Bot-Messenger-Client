@@ -147,22 +147,31 @@ function sendWhy(recipientId) {
 
 function sendHow(recipientId) {
   var sendMsg = `
-  Here's how I work!
-  https://github.com/benwinding/Messenger-Meme-Bot
+Here's how I work!
+https://github.com/benwinding/Messenger-Meme-Bot
+
+(Ben Winding 2017)
 `;
   sendTextMessage(recipientId, sendMsg);
 }
 
 function sendHelp(recipientId) {
-  var apiDesc = `I'm glad you asked ( ͡° ͜ʖ ͡°), 
-meme = random meme from all of time
-meme week|month|year = random meme from interval
-help = sends this message ...
-why = the reason why I exist!
+  var apiDesc = `( ͡° ͜ʖ ͡°) Below are my commands:
+
+meme = random meme ;)
+
+meme day = meme from day
+meme week = meme from week
+meme month = meme from month
+meme year = meme from year
+
+help = this...
+why = ??
 how = source code link
-random = sends random image (not garanteed to be a meme)
+random = sends really random image
 
 Careful, you could get anything with memebot...
+(Ben Winding 2017)
   `;
   sendTextMessage(recipientId, apiDesc);
 }
@@ -181,7 +190,7 @@ function sendWelcome(recipientId) {
 I'm your personal memebot! 
 type 'meme' and see what happens... 
 ¯\\_(ツ)_/¯ 
-or 'help' for more details
+or 'help' for more details.
       `;
       sendTextMessage(recipientId, welcomeMsg);
     }
@@ -189,99 +198,29 @@ or 'help' for more details
 }
 
 function sendMeme(recipientId) {
-  request({
-      url: 'https://api.imgur.com/3/gallery/t/meme/top/all/' + randomIntFromInterval(0,5),
-      headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
-    },
-    function (error, response, body) {
-      if (error || response.statusCode != 200) return;
-
-      var imgurApiResponse = JSON.parse(body);
-      var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data.items);
-      if(randomGalleryItem.is_album) {
-         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
-      }
-      else {
-         sendImage(recipientId, randomGalleryItem.link);
-      }
-    }
-  );
+  sendMemeFunction(recipientId, 'all', 5, 60);
 }
 
 function sendMemeDay(recipientId) {
-  request({
-      url: 'https://api.imgur.com/3/gallery/t/meme/top/day/',
-      headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
-    },
-    function (error, response, body) {
-      if (error || response.statusCode != 200) return;
-
-      var imgurApiResponse = JSON.parse(body);
-      var firstBest = imgurApiResponse.data.items.slice(0,20);
-      var randomGalleryItem = getRandomItemFromArray(firstBest);
-      if(randomGalleryItem.is_album) {
-         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
-      }
-      else {
-         sendImage(recipientId, randomGalleryItem.link);
-      }
-    }
-  );
+  sendMemeFunction(recipientId, 'day', 0, 10);
 }
 
 function sendMemeWeek(recipientId) {
-  request({
-      url: 'https://api.imgur.com/3/gallery/t/meme/top/week/',
-      headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
-    },
-    function (error, response, body) {
-      if (error || response.statusCode != 200) return;
-
-      var imgurApiResponse = JSON.parse(body);
-      var firstBest = imgurApiResponse.data.items.slice(0,20);
-      var randomGalleryItem = getRandomItemFromArray(firstBest);
-      if(randomGalleryItem.is_album) {
-         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
-      }
-      else {
-         sendImage(recipientId, randomGalleryItem.link);
-      }
-    }
-  );
+  sendMemeFunction(recipientId, 'month', 1, 50);
 }
 
 function sendMemeMonth(recipientId) {
-  request({
-      url: 'https://api.imgur.com/3/gallery/t/meme/top/month/',
-      headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
-    },
-    function (error, response, body) {
-      if (error || response.statusCode != 200) return;
-
-      var imgurApiResponse = JSON.parse(body);
-      var firstBest = imgurApiResponse.data.items.slice(0,40);
-      var randomGalleryItem = getRandomItemFromArray(firstBest);
-      if(randomGalleryItem.is_album) {
-         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
-      }
-      else {
-         sendImage(recipientId, randomGalleryItem.link);
-      }
-    }
-  );
+  sendMemeFunction(recipientId, 'month', 5, 60);
 }
 
 function sendMemeYear(recipientId) {
+  sendMemeFunction(recipientId, 'year', 6, 60);
+}
+
+function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
+{
   request({
-      url: 'https://api.imgur.com/3/gallery/t/meme/top/year/',
+      url: 'https://api.imgur.com/3/gallery/t/dump/top/' + timePeriod + '/' + randomIntFromInterval(0,pageLast),
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
       }
@@ -289,8 +228,8 @@ function sendMemeYear(recipientId) {
     function (error, response, body) {
       if (error || response.statusCode != 200) return;
 
-      var imgurApiResponse = JSON.parse(body);
-      var firstBest = imgurApiResponse.data.items.slice(0,80);
+      var galleryResponse = JSON.parse(body);
+      var firstBest = galleryResponse.data.items.slice(0,itemsLast);
       var randomGalleryItem = getRandomItemFromArray(firstBest);
       if(randomGalleryItem.is_album) {
          sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
