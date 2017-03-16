@@ -1,23 +1,33 @@
-# Facebook Messenger Bot
+# Facebook Messenger Meme Bot
 
-This example project creates a Facebook Messenger bot, completely
+This example project creates a Facebook Messenger MEME bot, completely
 mirroring the quickstart located in [Messenger Platform docs](https://developers.facebook.com/docs/messenger-platform/guides/quick-start).
 
 It's an echo bot that responds to a user's message by repeating their message back to them. It also sends a generic template when a message with "generic" text is received. This project is not dependent on any external libraries and can easily be extended.
 
-![](https://cdn.gomix.com/ca73ace5-3fff-4b8f-81c5-c64452145271%2FmessengerBotGIF.gif)
+![](https://i.imgur.com/RYUQcCZ.gif)
 
-## Getting Started
-To get started you need to:
+## How to use?
 
-- Set up your Facebook app on Facebook
+Go to the [Meme Bot Page](https://www.facebook.com/Meme-Bot-463703117294048/) and click Send Message, then await
 
-- Configure your Facebook App
+## How's That Work'n!
 
-  The `Callback URL` you set when configuring your app on Facebook is your Gomix project's publish URL with '/webhook' appended. The publish URL is what loads when you click 'Show' and has the format 'https://project-name.gomix.me', so for this example we used 'https://messenger-bot.gomix.me/webhook' for the Callback URL.
+Uses web api's from [imgur](https://imgur.com) and [fasebook](https://fb.com) to bring you the dank.
 
-  The `Verify Token` is a string you make up - it's just used to make sure it is your Facebook app that your server is interacting with. 
+## Meme Bot API
 
-- Copy your app credentials into the `.env` file
+The meme bot uses the following API:
 
-For more detailed setup instructions, see [Messenger Platform Quick Start](https://developers.facebook.com/docs/messenger-platform/guides/quick-start).
+| command | action                                                    |
+|---------|---------------------------------------------------------- |
+| meme    | Send a random meme from imgur                             |
+| help    | Lists the api (this)                                      |
+| why     | ?                                                         |
+| how     | Link to here                                              |
+
+## Why Though?
+
+   - Bring the memes to the people, make the world a better/worse place 
+   - kind of like executing terminal commands,
+   - for the lolz

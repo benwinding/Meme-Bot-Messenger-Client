@@ -86,7 +86,19 @@ function receivedMessage(event) {
   if (messageText) {
     // If we receive a text message, check to see if it matches a keyword
     // and send back the template example. Otherwise, just echo the text we received.
-    if(textMatches(messageText, "meme"))
+    if(textMatches(messageText, "meme test"))
+      sendMemeTEST(senderID, messageText);
+    else if(textMatches(messageText, "meme day"))
+      sendMemeDay(senderID);
+    else if(textMatches(messageText, "meme week"))
+      sendMemeWeek(senderID);
+    else if(textMatches(messageText, "meme month"))
+      sendMemeMonth(senderID);
+    else if(textMatches(messageText, "meme year"))
+      sendMemeYear(senderID);
+    else if(textMatches(messageText, "meme all"))
+      sendMeme(senderID);
+    else if(textMatches(messageText, "meme"))
       sendMeme(senderID);
     else if(textMatches(messageText, "help"))
       sendHelp(senderID);
@@ -94,9 +106,13 @@ function receivedMessage(event) {
       sendWhy(senderID);
     else if(textMatches(messageText, "how"))
       sendHow(senderID);
+    else if(textMatches(messageText, "random"))
+      sendRandom(senderID);
     else
       sendWelcome(senderID);
   }
+  else
+    sendWelcome(senderID);
 }
 
 function textMatches(message, matchString) {
@@ -139,9 +155,14 @@ function sendHow(recipientId) {
 
 function sendHelp(recipientId) {
   var apiDesc = `I'm glad you asked ( ͡° ͜ʖ ͡°), 
-meme = sends a random meme image found on imgur.com
+meme = random meme from all of time
+meme week|month|year = random meme from interval
 help = sends this message ...
-why = sends the reason why I exist!
+why = the reason why I exist!
+how = source code link
+random = sends random image (not garanteed to be a meme)
+
+Careful, you could get anything with memebot...
   `;
   sendTextMessage(recipientId, apiDesc);
 }
@@ -169,7 +190,7 @@ or 'help' for more details
 
 function sendMeme(recipientId) {
   request({
-      url: 'https://api.imgur.com/3/gallery/t/meme',
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/all/' + randomIntFromInterval(0,5),
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
       }
@@ -179,6 +200,147 @@ function sendMeme(recipientId) {
 
       var imgurApiResponse = JSON.parse(body);
       var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data.items);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendMemeDay(recipientId) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/day/',
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var firstBest = imgurApiResponse.data.items.slice(0,20);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendMemeWeek(recipientId) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/week/',
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var firstBest = imgurApiResponse.data.items.slice(0,20);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendMemeMonth(recipientId) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/month/',
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var firstBest = imgurApiResponse.data.items.slice(0,40);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendMemeYear(recipientId) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/year/',
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var firstBest = imgurApiResponse.data.items.slice(0,80);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function randomIntFromInterval(min,max)
+{
+  return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function sendMemeTEST(recipientId, message) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/all/' + randomIntFromInterval(1,10),
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data.items);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendRandom(recipientId) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/random/random/1/',
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data);
       if(randomGalleryItem.is_album) {
          sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
       }
