@@ -86,7 +86,23 @@ function receivedMessage(event) {
   if (messageText) {
     // If we receive a text message, check to see if it matches a keyword
     // and send back the template example. Otherwise, just echo the text we received.
-    if(textMatches(messageText, "meme"))
+    if(textMatches(messageText, "meme test"))
+      sendMemeTEST(senderID, messageText);
+    else if(textMatches(messageText, "meme time"))
+      sendTimeReminder(senderID);
+    else if(textMatches(messageText, "meme day"))
+      sendMemeDay(senderID);
+    else if(textMatches(messageText, "meme week"))
+      sendMemeWeek(senderID);
+    else if(textMatches(messageText, "meme month"))
+      sendMemeMonth(senderID);
+    else if(textMatches(messageText, "meme year"))
+      sendMemeYear(senderID);
+    else if(textMatches(messageText, "meme all"))
+      sendMeme(senderID);
+    else if(textMatches(messageText, "meme dank"))
+      sendMemeDank(senderID);
+    else if(textMatches(messageText, "meme"))
       sendMeme(senderID);
     else if(textMatches(messageText, "help"))
       sendHelp(senderID);
@@ -94,9 +110,13 @@ function receivedMessage(event) {
       sendWhy(senderID);
     else if(textMatches(messageText, "how"))
       sendHow(senderID);
+    else if(textMatches(messageText, "random"))
+      sendRandom(senderID);
     else
       sendWelcome(senderID);
   }
+  else
+    sendWelcome(senderID);
 }
 
 function textMatches(message, matchString) {
@@ -124,6 +144,16 @@ function logObject(obj) {
   console.log(JSON.stringify(obj, null, 2));
 }
 
+function sendTimeReminder(recipientId) {
+  var sendMsg = `Instead of typing:
+meme time
+ write
+meme day
+ or week,year,all,dank
+`;
+  sendTextMessage(recipientId, sendMsg);
+}
+
 function sendWhy(recipientId) {
   var sendMsg = `why the hell not mate?!`;
   sendTextMessage(recipientId, sendMsg);
@@ -131,17 +161,28 @@ function sendWhy(recipientId) {
 
 function sendHow(recipientId) {
   var sendMsg = `
-  Here's how I work!
-  https://github.com/benwinding/Messenger-Meme-Bot
+Here's how I work!
+https://github.com/benwinding/Messenger-Meme-Bot
+
+(Ben Winding 2017)
 `;
   sendTextMessage(recipientId, sendMsg);
 }
 
 function sendHelp(recipientId) {
-  var apiDesc = `I'm glad you asked ( ͡° ͜ʖ ͡°), 
-meme = sends a random meme image found on imgur.com
-help = sends this message ...
-why = sends the reason why I exist!
+  var apiDesc = `( ͡° ͜ʖ ͡°) Below are my commands:
+meme = random meme ;)
+meme dank = dank meme
+meme time = meme from day|week|month|year
+
+help = this...
+why = ??
+how = source code link
+random = sends really random image
+
+Careful, you could get anything with memebot...
+
+(Ben Winding 2017)
   `;
   sendTextMessage(recipientId, apiDesc);
 }
@@ -160,16 +201,69 @@ function sendWelcome(recipientId) {
 I'm your personal memebot! 
 type 'meme' and see what happens... 
 ¯\\_(ツ)_/¯ 
-or 'help' for more details
+or 'help' for more details.
       `;
       sendTextMessage(recipientId, welcomeMsg);
     }
   );
 }
 
+function sendMemeDank(recipientId) {
+  sendMemeFunction(recipientId, 'day', 0, 10);
+}
+
 function sendMeme(recipientId) {
+  sendMemeFunction(recipientId, 'all', 3, 60);
+}
+
+function sendMemeDay(recipientId) {
+  sendMemeFunction(recipientId, 'day', 0, 10);
+}
+
+function sendMemeWeek(recipientId) {
+  sendMemeFunction(recipientId, 'month', 1, 50);
+}
+
+function sendMemeMonth(recipientId) {
+  sendMemeFunction(recipientId, 'month', 3, 60);
+}
+
+function sendMemeYear(recipientId) {
+  sendMemeFunction(recipientId, 'year', 4, 60);
+}
+
+function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
+{
   request({
-      url: 'https://api.imgur.com/3/gallery/t/meme',
+      url: 'https://api.imgur.com/3/gallery/t/dump/top/' + timePeriod + '/' + randomIntFromInterval(0,pageLast),
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var galleryResponse = JSON.parse(body);
+      var firstBest = galleryResponse.data.items.slice(0,itemsLast);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function randomIntFromInterval(min,max)
+{
+  return Math.floor(Math.random()*(max-min+1)+min);
+}
+
+function sendMemeTEST(recipientId, message) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/t/meme/top/all/' + randomIntFromInterval(1,10),
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
       }
@@ -179,6 +273,28 @@ function sendMeme(recipientId) {
 
       var imgurApiResponse = JSON.parse(body);
       var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data.items);
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendRandom(recipientId) {
+  request({
+      url: 'https://api.imgur.com/3/gallery/random/random/1/',
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+
+      var imgurApiResponse = JSON.parse(body);
+      var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data);
       if(randomGalleryItem.is_album) {
          sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
       }
