@@ -118,7 +118,7 @@ function receivedMessage(event) {
       sendWelcome(senderID);
   }
   else
-    sendWelcome(senderID);
+    sendMeme(senderID);
 }
 
 //////////////////////////
@@ -422,7 +422,7 @@ function textMatches(message, matchString) {
 }
 
 function getRandomItemFromArray(items) {
-  var random_item = items[getRandomNumber(0, items.length)];
+  var random_item = items[getRandomNumber(0, items.length - 1)];
   return random_item;
 }
 
