@@ -99,9 +99,11 @@ function receivedMessage(event) {
     else if(textMatches(messageText, "meme year"))
       sendMemeYear(senderID);
     else if(textMatches(messageText, "meme all"))
-      sendMeme(senderID);
-    else if(textMatches(messageText, "meme dank"))
+      sendMemeAll(senderID);
+    else if(textMatches(messageText, "dank"))
       sendMemeDank(senderID);
+    else if(textMatches(messageText, "find "))
+      sendSearched(senderID, messageText);
     else if(textMatches(messageText, "meme"))
       sendMeme(senderID);
     else if(textMatches(messageText, "help"))
@@ -119,30 +121,9 @@ function receivedMessage(event) {
     sendWelcome(senderID);
 }
 
-function textMatches(message, matchString) {
-  return message.toLowerCase().indexOf(matchString) != -1;
-}
-
 //////////////////////////
-// Sending helpers
+// Send Descriptions
 //////////////////////////
-
-function sendTextMessage(recipientId, messageText) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    message: {
-      text: messageText
-    }
-  };
-
-  callSendAPI(messageData);
-}
-
-function logObject(obj) {
-  console.log(JSON.stringify(obj, null, 2));
-}
 
 function sendTimeReminder(recipientId) {
   var sendMsg = `Instead of typing:
@@ -172,8 +153,8 @@ https://github.com/benwinding/Messenger-Meme-Bot
 function sendHelp(recipientId) {
   var apiDesc = `( ͡° ͜ʖ ͡°) Below are my commands:
 meme = random meme ;)
-meme dank = dank meme
-meme time = meme from day|week|month|year
+dank = dank meme
+find ??? = finds a meme related to ???
 
 help = this...
 why = ??
@@ -197,7 +178,9 @@ function sendWelcome(recipientId) {
     
       var fbProfileBody = JSON.parse(body);
       var userName = fbProfileBody["first_name"];
-      var welcomeMsg = `Hello ${userName}, 
+      var greetings = ["Hey", "Howdy", "Hello", "G'day", "Bonjur", "Good Evening", "Good Morning", "Yo", "What's up"];
+      var randomGreeting = getRandomItemFromArray(greetings);
+      var welcomeMsg = `${randomGreeting} ${userName}, 
 I'm your personal memebot! 
 type 'meme' and see what happens... 
 ¯\\_(ツ)_/¯ 
@@ -208,12 +191,22 @@ or 'help' for more details.
   );
 }
 
+//////////////////////////
+// Meme senders
+//////////////////////////
+
 function sendMemeDank(recipientId) {
-  sendMemeFunction(recipientId, 'day', 0, 10);
+  sendMemeFunctionSubReddit(recipientId, 'dankmemes', 'week', 2, 40);
 }
 
 function sendMeme(recipientId) {
-  sendMemeFunction(recipientId, 'all', 3, 60);
+  sendMemeFunction(recipientId, 'month', 0, 30);
+}
+
+function sendSearched(recipientId, message) {
+  var strings = message.split(' ');
+  if(strings.length < 2) return;
+  sendMemeSearched(recipientId, strings[1]);
 }
 
 function sendMemeDay(recipientId) {
@@ -230,6 +223,10 @@ function sendMemeMonth(recipientId) {
 
 function sendMemeYear(recipientId) {
   sendMemeFunction(recipientId, 'year', 4, 60);
+}
+
+function sendMemeAll(recipientId) {
+  sendMemeFunction(recipientId, 'all', 3, 60);
 }
 
 function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
@@ -256,14 +253,10 @@ function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
   );
 }
 
-function randomIntFromInterval(min,max)
+function sendMemeFunctionSubReddit(recipientId, subReddit, timePeriod, pageLast, itemsLast)
 {
-  return Math.floor(Math.random()*(max-min+1)+min);
-}
-
-function sendMemeTEST(recipientId, message) {
   request({
-      url: 'https://api.imgur.com/3/gallery/t/meme/top/all/' + randomIntFromInterval(1,10),
+      url: 'https://api.imgur.com/3/gallery/r/' + subReddit + '/top/' + timePeriod + '/' + randomIntFromInterval(0,pageLast),
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
       }
@@ -271,8 +264,9 @@ function sendMemeTEST(recipientId, message) {
     function (error, response, body) {
       if (error || response.statusCode != 200) return;
 
-      var imgurApiResponse = JSON.parse(body);
-      var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data.items);
+      var galleryResponse = JSON.parse(body);
+      var firstBest = galleryResponse.data.slice(0,itemsLast);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
       if(randomGalleryItem.is_album) {
          sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
       }
@@ -281,6 +275,41 @@ function sendMemeTEST(recipientId, message) {
       }
     }
   );
+}
+
+function sendMemeSearched(recipientId, searchMeme, itemsLast)
+{
+  request({
+      url: 'https://api.imgur.com/3/gallery/search/top/0?q=meme%20' + searchMeme,
+      headers: {
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      }
+    },
+    function (error, response, body) {
+      if (error || response.statusCode != 200) return;
+      var galleryResponse = JSON.parse(body);
+      if(galleryResponse.data.length == 0) {
+        sendTextMessage(recipientId, "No memes found :( try a different search word");
+        return;
+      }
+      var firstBest = galleryResponse.data.slice(0,itemsLast);
+      var randomGalleryItem = getRandomItemFromArray(firstBest);
+      if(randomGalleryItem === undefined) {
+        sendTextMessage(recipientId, "No memes found :( try a different search word");
+        return;
+      }
+      if(randomGalleryItem.is_album) {
+         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+      }
+      else {
+         sendImage(recipientId, randomGalleryItem.link);
+      }
+    }
+  );
+}
+
+function sendMemeTEST(recipientId, message) {
+  sendMemeSearched(recipientId, 'dog', 10);
 }
 
 function sendRandom(recipientId) {
@@ -294,6 +323,7 @@ function sendRandom(recipientId) {
       if (error || response.statusCode != 200) return;
 
       var imgurApiResponse = JSON.parse(body);
+      logObject(imgurApiResponse);
       var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data);
       if(randomGalleryItem.is_album) {
          sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
@@ -340,9 +370,17 @@ function sendImage(recipientId, imageUrl) {
   callSendAPI(messageData);
 }
 
-function getRandomItemFromArray(items) {
-  var random_item = items[Math.floor(Math.random()*items.length)];
-  return random_item;
+function sendTextMessage(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      text: messageText
+    }
+  };
+
+  callSendAPI(messageData);
 }
 
 function callSendAPI(messageData) {
@@ -365,6 +403,31 @@ function callSendAPI(messageData) {
       console.error(error);
     }
   });  
+}
+
+//////////////////////////
+// Generic helpers
+//////////////////////////
+
+function getRandomNumber(minimum, maxmimum) {
+  return Math.floor(Math.exp(Math.random()*Math.log(maxmimum-minimum+1)))+minimum;
+}
+
+function randomIntFromInterval(min,max) {
+  return getRandomNumber(min, max);
+}
+
+function textMatches(message, matchString) {
+  return message.toLowerCase().indexOf(matchString) != -1;
+}
+
+function getRandomItemFromArray(items) {
+  var random_item = items[getRandomNumber(0, items.length)];
+  return random_item;
+}
+
+function logObject(obj) {
+  console.log(JSON.stringify(obj, null, 2));
 }
 
 // Set Express to listen out for HTTP requests
