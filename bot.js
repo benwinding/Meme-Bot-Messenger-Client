@@ -7,6 +7,7 @@ const bodyParser = require('body-parser');
 const request = require('request');
 const path = require('path');
 var messengerButton = "<html><head><title>Facebook Messenger Bot</title></head><body><h1>Facebook Messenger Bot</h1>This is a bot based on Messenger Platform QuickStart. For more details, see their <a href=\"https://developers.facebook.com/docs/messenger-platform/guides/quick-start\">docs</a>.<footer id=\"gWidget\"></footer><script src=\"https://widget.glitch.me/widget.min.js\"></script></body></html>";
+const DEBUG = false;
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -37,7 +38,6 @@ app.get('/', function(req, res) {
 
 // Message processing
 app.post('/webhook', function (req, res) {
-  console.log(req.body);
   var data = req.body;
 
   // Make sure this is a page subscription
@@ -74,9 +74,7 @@ function receivedMessage(event) {
   var timeOfMessage = event.timestamp;
   var message = event.message;
 
-  console.log("Received message from user %d with message:", 
-    senderID);
-  console.log(JSON.stringify(message));
+  logMessage(`Received message from user ${senderID}, with message: ${message.text}`);
 
   var messageId = message.mid;
 
@@ -84,41 +82,45 @@ function receivedMessage(event) {
   var messageAttachments = message.attachments;
 
   if (messageText) {
-    // If we receive a text message, check to see if it matches a keyword
-    // and send back the template example. Otherwise, just echo the text we received.
-    if(textMatches(messageText, "meme test"))
-      sendMemeTEST(senderID, messageText);
-    else if(textMatches(messageText, "meme time"))
-      sendTimeReminder(senderID);
-    else if(textMatches(messageText, "meme day"))
-      sendMemeDay(senderID);
-    else if(textMatches(messageText, "meme week"))
-      sendMemeWeek(senderID);
-    else if(textMatches(messageText, "meme month"))
-      sendMemeMonth(senderID);
-    else if(textMatches(messageText, "meme year"))
-      sendMemeYear(senderID);
-    else if(textMatches(messageText, "meme all"))
-      sendMemeAll(senderID);
-    else if(textMatches(messageText, "dank"))
-      sendMemeDank(senderID);
-    else if(textMatches(messageText, "find "))
-      sendSearched(senderID, messageText);
-    else if(textMatches(messageText, "meme"))
-      sendMeme(senderID);
-    else if(textMatches(messageText, "help"))
-      sendHelp(senderID);
-    else if(textMatches(messageText, "why"))
-      sendWhy(senderID);
-    else if(textMatches(messageText, "how"))
-      sendHow(senderID);
-    else if(textMatches(messageText, "random"))
-      sendRandom(senderID);
-    else
+    var messageTerms = messageText.split(' ');
+
+    if(messageTerms.length == 1) {
+      var firstTerm = messageTerms[0];
+      if(textMatches(firstTerm, "meme"))
+        sendMeme(senderID);
+      else if(textMatches(messageText, "dank"))
+        sendMemeDank(senderID);
+      else if(textMatches(firstTerm, "help"))
+        sendHelp(senderID);
+      else if(textMatches(firstTerm, "why"))
+        sendWhy(senderID);
+      else if(textMatches(firstTerm, "how"))
+        sendHow(senderID);
+      else if(textMatches(firstTerm, "random"))
+        sendRandom(senderID);
+      else
+        sendWelcome(senderID);
+    }
+    else {
+      removeString(messageTerms, "meme");
+      if(textMatches(messageText, "find"))
+      {
+        removeString(messageTerms, "find");
+        var searchTerm = getLongestString(messageTerms);
+        sendSearched(senderID, searchTerm);
+      }
+      else if(textMatches(messageText, "search"))
+      {
+        removeString(messageTerms, "search");
+        var searchTerm = getLongestString(messageTerms);
+        sendSearched(senderID, searchTerm);
+      }
+      else
       sendWelcome(senderID);
+    }
   }
   else
-    sendMeme(senderID);
+    sendMemeMonth(senderID);
 }
 
 //////////////////////////
@@ -200,13 +202,19 @@ function sendMemeDank(recipientId) {
 }
 
 function sendMeme(recipientId) {
-  sendMemeFunction(recipientId, 'month', 0, 30);
+  var whichMeme = getRandomNumber(1, 5);
+  switch(whichMeme) {
+    case 1: sendMemeDay(recipientId); break;
+    case 2: sendMemeWeek(recipientId); break;
+    case 3: sendMemeMonth(recipientId); break;
+    case 4: sendMemeYear(recipientId); break;
+    case 5: sendMemeAll(recipientId); break;
+    default: sendMemeAll(recipientId); break;
+  }
 }
 
-function sendSearched(recipientId, message) {
-  var strings = message.split(' ');
-  if(strings.length < 2) return;
-  sendMemeSearched(recipientId, strings[1]);
+function sendSearched(recipientId, searchTerm) {
+  sendMemeSearched(recipientId, searchTerm);
 }
 
 function sendMemeDay(recipientId) {
@@ -240,14 +248,16 @@ function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
     function (error, response, body) {
       if (error || response.statusCode != 200) return;
 
+      logMessage(`--Finding memes in 'dump' time: ${timePeriod}, pages:${pageLast}, numItems:${itemsLast}`);
       var galleryResponse = JSON.parse(body);
+      logMessage(`--Found: ${galleryResponse.data.items.length}, albumns or single images`);
       var firstBest = galleryResponse.data.items.slice(0,itemsLast);
       var randomGalleryItem = getRandomItemFromArray(firstBest);
       if(randomGalleryItem.is_album) {
-         sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
+        sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
       }
       else {
-         sendImage(recipientId, randomGalleryItem.link);
+        sendImage(recipientId, randomGalleryItem.link);
       }
     }
   );
@@ -264,7 +274,9 @@ function sendMemeFunctionSubReddit(recipientId, subReddit, timePeriod, pageLast,
     function (error, response, body) {
       if (error || response.statusCode != 200) return;
 
+      logMessage(`--Finding memes in 'subreddit' subReddit:${subReddit}, time: ${timePeriod}, pages:${pageLast}, numItems:${itemsLast}`);
       var galleryResponse = JSON.parse(body);
+      logMessage(`--Found: ${galleryResponse.data.length}, albumns or single images`);
       var firstBest = galleryResponse.data.slice(0,itemsLast);
       var randomGalleryItem = getRandomItemFromArray(firstBest);
       if(randomGalleryItem.is_album) {
@@ -286,12 +298,14 @@ function sendMemeSearched(recipientId, searchMeme, itemsLast)
       }
     },
     function (error, response, body) {
+      logMessage(`--Searching for meme with keyword: ${searchMeme}`);
       if (error || response.statusCode != 200) return;
       var galleryResponse = JSON.parse(body);
       if(galleryResponse.data.length == 0) {
-        sendTextMessage(recipientId, "No memes found :( try a different search word");
+        sendTextMessage(recipientId, "No memes found :( try another");
         return;
       }
+      logMessage(`--Found: ${galleryResponse.data.length}, albumns or single images`);
       var firstBest = galleryResponse.data.slice(0,itemsLast);
       var randomGalleryItem = getRandomItemFromArray(firstBest);
       if(randomGalleryItem === undefined) {
@@ -323,7 +337,7 @@ function sendRandom(recipientId) {
       if (error || response.statusCode != 200) return;
 
       var imgurApiResponse = JSON.parse(body);
-      logObject(imgurApiResponse);
+      logObjectDebug(imgurApiResponse);
       var randomGalleryItem = getRandomItemFromArray(imgurApiResponse.data);
       if(randomGalleryItem.is_album) {
          sendRandomAlbumnImage(recipientId, randomGalleryItem.id);
@@ -346,8 +360,9 @@ function sendRandomAlbumnImage(recipientId, id) {
       if (error || response.statusCode != 200) return;
 
       var imgurApiResponse = JSON.parse(body);
+      logMessage(`--Albumn selected with: ${imgurApiResponse.data.images.length} images, url: ${"https://imgur.com/gallery/" + id}`);
       var randomAblumnImage = getRandomItemFromArray(imgurApiResponse.data.images);
-      logObject(randomAblumnImage);
+      logObjectDebug(randomAblumnImage);
       sendImage(recipientId, randomAblumnImage.link);
     }
   );
@@ -367,6 +382,7 @@ function sendImage(recipientId, imageUrl) {
       }
     }
   }
+  logMessage(`--Sending image with url: ${imageUrl}`);
   callSendAPI(messageData);
 }
 
@@ -395,12 +411,11 @@ function callSendAPI(messageData) {
       var recipientId = body.recipient_id;
       var messageId = body.message_id;
 
-      console.log("Successfully sent generic message with id %s to recipient %s", 
-        messageId, recipientId);
+      logMessage(`Successfully sent generic message with id ${messageId} to recipient ${recipientId}`); 
     } else {
-      console.error("Unable to send message.");
-      console.error(response);
-      console.error(error);
+      logMessage("Unable to send message"); 
+      logMessage(response);
+      logMessage(error);
     }
   });  
 }
@@ -410,7 +425,7 @@ function callSendAPI(messageData) {
 //////////////////////////
 
 function getRandomNumber(minimum, maxmimum) {
-  return Math.floor(Math.exp(Math.random()*Math.log(maxmimum-minimum+1)))+minimum;
+  return Math.floor(Math.exp(Math.random()*Math.log(maxmimum-minimum+2)))+minimum-1;
 }
 
 function randomIntFromInterval(min,max) {
@@ -426,8 +441,23 @@ function getRandomItemFromArray(items) {
   return random_item;
 }
 
-function logObject(obj) {
-  console.log(JSON.stringify(obj, null, 2));
+function removeString(strArray) {
+    var index = strArray.indexOf(strArray);
+    if(index != -1)
+        strArray.splice(index, 1);
+}
+
+function getLongestString(strArray) {
+  return strArray.sort(function (a, b) { return b.length - a.length; })[0];
+}
+
+function logObjectDebug(obj) {
+  if(DEBUG)
+    console.log(JSON.stringify(obj, null, 2));
+}
+
+function logMessage(logMessage) {
+  console.log(logMessage);
 }
 
 // Set Express to listen out for HTTP requests
