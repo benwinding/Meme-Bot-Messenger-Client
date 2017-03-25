@@ -103,7 +103,9 @@ function receivedMessage(event) {
     }
     else {
       removeString(messageTerms, "meme");
-      if(textMatches(messageText, "find"))
+      if(textMatches(messageText, "dank"))
+        sendMemeDank(senderID);
+      else if(textMatches(messageText, "find"))
       {
         removeString(messageTerms, "find");
         var searchTerm = getLongestString(messageTerms);
@@ -116,7 +118,7 @@ function receivedMessage(event) {
         sendSearched(senderID, searchTerm);
       }
       else
-      sendWelcome(senderID);
+        sendWelcome(senderID);
     }
   }
   else
@@ -126,16 +128,6 @@ function receivedMessage(event) {
 //////////////////////////
 // Send Descriptions
 //////////////////////////
-
-function sendTimeReminder(recipientId) {
-  var sendMsg = `Instead of typing:
-meme time
- write
-meme day
- or week,year,all,dank
-`;
-  sendTextMessage(recipientId, sendMsg);
-}
 
 function sendWhy(recipientId) {
   var sendMsg = `why the hell not mate?!`;
@@ -442,9 +434,9 @@ function getRandomItemFromArray(items) {
 }
 
 function removeString(strArray) {
-    var index = strArray.indexOf(strArray);
-    if(index != -1)
-        strArray.splice(index, 1);
+  var index = strArray.indexOf(strArray);
+  if(index != -1)
+      strArray.splice(index, 1);
 }
 
 function getLongestString(strArray) {
