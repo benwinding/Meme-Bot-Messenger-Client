@@ -146,14 +146,14 @@ https://github.com/benwinding/Messenger-Meme-Bot
 
 function sendHelp(recipientId) {
   var apiDesc = `( ͡° ͜ʖ ͡°) Below are my commands:
-meme = random meme ;)
-dank = dank meme
-find ??? = finds a meme related to ???
+👍 or meme => random meme ;)
+dank => dank meme
+find ??? => finds a meme related to ???
 
-help = this...
-why = ??
-how = source code link
-random = sends really random image
+help => this...
+why => ??
+how => source code link
+random => sends really random image
 
 Careful, you could get anything with memebot...
 
@@ -176,9 +176,10 @@ function sendWelcome(recipientId) {
       var randomGreeting = getRandomItemFromArray(greetings);
       var welcomeMsg = `${randomGreeting} ${userName}, 
 I'm your personal memebot! 
-type 'meme' and see what happens... 
-¯\\_(ツ)_/¯ 
-or 'help' for more details.
+ press 👍
+or 
+ type 'help' for more details.
+¯\\_(ツ)_/¯
       `;
       sendTextMessage(recipientId, welcomeMsg);
     }
