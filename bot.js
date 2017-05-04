@@ -88,6 +88,10 @@ function receivedMessage(event) {
       var firstTerm = messageTerms[0];
       if(textMatches(firstTerm, "meme"))
         sendMeme(senderID);
+      else if(textMatches(firstTerm, "👍"))
+        sendMeme(senderID);
+      else if(textMatches(firstTerm, "normal"))
+        sendMeme(senderID);
       else if(textMatches(messageText, "dank"))
         sendMemeDank(senderID);
       else if(textMatches(firstTerm, "help"))
@@ -98,6 +102,8 @@ function receivedMessage(event) {
         sendHow(senderID);
       else if(textMatches(firstTerm, "random"))
         sendRandom(senderID);
+      else if(textMatches(firstTerm, "test"))
+        sendImageWithButton(senderID, "http://i.imgur.com/Cn6FqmO.jpg");
       else
         sendWelcome(senderID);
     }
@@ -176,9 +182,9 @@ function sendWelcome(recipientId) {
       var randomGreeting = getRandomItemFromArray(greetings);
       var welcomeMsg = `${randomGreeting} ${userName}, 
 I'm your personal memebot! 
- press 👍
+ press 👍 (Thumbs up button)
 or 
- type 'help' for more details.
+ type 'help' (for more details)
 ¯\\_(ツ)_/¯
       `;
       sendTextMessage(recipientId, welcomeMsg);
@@ -366,13 +372,71 @@ function sendImage(recipientId, imageUrl) {
     recipient: {
       id: recipientId
     },
-    message: {
+    "message":{
       attachment: { 
         type: "image",
         payload: {
           url: imageUrl
         }
-      }
+      },
+      "quick_replies":[
+        {
+          "content_type":"text",
+          "title":"Normal",
+          "payload":"   ",
+          "image_url":"http://i.imgur.com/vTstaG7.png"
+        },
+        {
+          "content_type":"text",
+          "title":"Dank",
+          "payload":"   ",
+          "image_url":"http://i.imgur.com/nE9A8zX.png"
+        },
+        {
+          "content_type":"text",
+          "title":"Random",
+          "payload":"   ",
+          "image_url":"http://i.imgur.com/mV7Diob.png"
+        }    
+      ]
+    }
+  }
+  logMessage(`--Sending image with url: ${imageUrl}`);
+  callSendAPI(messageData);
+}
+
+function sendImageWithButton(recipientId, imageUrl) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    "message":{
+      attachment: { 
+        type: "image",
+        payload: {
+          url: imageUrl
+        }
+      },
+      "quick_replies":[
+        {
+          "content_type":"text",
+          "title":"Normal",
+          "payload":"   ",
+          "image_url":"http://i.imgur.com/vTstaG7.png"
+        },
+        {
+          "content_type":"text",
+          "title":"Dank",
+          "payload":"   ",
+          "image_url":"http://i.imgur.com/nE9A8zX.png"
+        },
+        {
+          "content_type":"text",
+          "title":"Random",
+          "payload":"   ",
+          "image_url":"http://i.imgur.com/mV7Diob.png"
+        }    
+      ]
     }
   }
   logMessage(`--Sending image with url: ${imageUrl}`);
