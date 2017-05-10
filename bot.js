@@ -102,8 +102,6 @@ function receivedMessage(event) {
         sendHow(senderID);
       else if(textMatches(firstTerm, "random"))
         sendRandom(senderID);
-      else if(textMatches(firstTerm, "test"))
-        sendImageWithButton(senderID, "http://i.imgur.com/Cn6FqmO.jpg");
       else
         sendWelcome(senderID);
     }
@@ -137,7 +135,7 @@ function receivedMessage(event) {
 
 function sendWhy(recipientId) {
   var sendMsg = `why the hell not mate?!`;
-  sendTextMessage(recipientId, sendMsg);
+  sendTextWithCommands(recipientId, sendMsg);
 }
 
 function sendHow(recipientId) {
@@ -147,15 +145,15 @@ https://github.com/benwinding/Messenger-Meme-Bot
 
 (Ben Winding 2017)
 `;
-  sendTextMessage(recipientId, sendMsg);
+  sendTextWithCommands(recipientId, sendMsg);
 }
 
 function sendHelp(recipientId) {
   var apiDesc = `( ͡° ͜ʖ ͡°) Below are my commands:
 👍 or meme => random meme ;)
 dank => dank meme
-find ??? => finds a meme related to ???
-
+find blah => finds a meme related to blah
+...
 help => this...
 why => ??
 how => source code link
@@ -165,7 +163,7 @@ Careful, you could get anything with memebot...
 
 (Ben Winding 2017)
   `;
-  sendTextMessage(recipientId, apiDesc);
+  sendTextWithCommands(recipientId, apiDesc);
 }
 
 function sendWelcome(recipientId) {
@@ -181,13 +179,11 @@ function sendWelcome(recipientId) {
       var greetings = ["Hey", "Howdy", "Hello", "G'day", "Bonjur", "Good Evening", "Good Morning", "Yo", "What's up"];
       var randomGreeting = getRandomItemFromArray(greetings);
       var welcomeMsg = `${randomGreeting} ${userName}, 
-I'm your personal memebot! 
- press 👍 (Thumbs up button)
-or 
- type 'help' (for more details)
+I'm your personal Memebot™!
+Try my buttons below!
 ¯\\_(ツ)_/¯
       `;
-      sendTextMessage(recipientId, welcomeMsg);
+      sendTextWithCommands(recipientId, welcomeMsg);
     }
   );
 }
@@ -197,18 +193,44 @@ or
 //////////////////////////
 
 function sendMemeDank(recipientId) {
-  sendMemeFunctionSubReddit(recipientId, 'dankmemes', 'week', 2, 40);
+  var choice = getRandomNumber(1, 11);
+  switch (choice) {
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+      sendMemeFunctionSubReddit(recipientId, 'dankmemes', 'week', 2, 30); break;
+    case 6:
+    case 7:
+    case 8:
+      sendMemeFunctionSubReddit(recipientId, 'dankmemes', 'month', 5, 40); break;
+    case 9:
+    case 10:
+      sendMemeFunctionSubReddit(recipientId, 'dankmemes', 'year', 10, 30); break;
+    default:
+      sendMemeFunctionSubReddit(recipientId, 'dankmemes', 'all', 10, 30); break;    
+  }
 }
 
 function sendMeme(recipientId) {
-  var whichMeme = getRandomNumber(1, 5);
-  switch(whichMeme) {
-    case 1: sendMemeDay(recipientId); break;
-    case 2: sendMemeWeek(recipientId); break;
-    case 3: sendMemeMonth(recipientId); break;
-    case 4: sendMemeYear(recipientId); break;
-    case 5: sendMemeAll(recipientId); break;
-    default: sendMemeAll(recipientId); break;
+  var choice = getRandomNumber(1, 11);
+  switch(choice) {
+    case 1: 
+    case 2: 
+    case 3: 
+    case 4: 
+    case 5: 
+      sendMemeWeek(recipientId); break;
+    case 6: 
+    case 7: 
+    case 8: 
+      sendMemeMonth(recipientId); break;
+    case 9: 
+    case 10: 
+      sendMemeYear(recipientId); break;
+    default: 
+      sendMemeAll(recipientId); break;
   }
 }
 
@@ -216,12 +238,8 @@ function sendSearched(recipientId, searchTerm) {
   sendMemeSearched(recipientId, searchTerm);
 }
 
-function sendMemeDay(recipientId) {
-  sendMemeFunction(recipientId, 'day', 0, 10);
-}
-
 function sendMemeWeek(recipientId) {
-  sendMemeFunction(recipientId, 'month', 1, 50);
+  sendMemeFunction(recipientId, 'week', 1, 50);
 }
 
 function sendMemeMonth(recipientId) {
@@ -301,14 +319,14 @@ function sendMemeSearched(recipientId, searchMeme, itemsLast)
       if (error || response.statusCode != 200) return;
       var galleryResponse = JSON.parse(body);
       if(galleryResponse.data.length == 0) {
-        sendTextMessage(recipientId, "No memes found :( try another");
+        sendTextWithCommands(recipientId, "No memes found :( try another");
         return;
       }
       logMessage(`--Found: ${galleryResponse.data.length}, albumns or single images`);
       var firstBest = galleryResponse.data.slice(0,itemsLast);
       var randomGalleryItem = getRandomItemFromArray(firstBest);
       if(randomGalleryItem === undefined) {
-        sendTextMessage(recipientId, "No memes found :( try a different search word");
+        sendTextWithCommands(recipientId, "No memes found :( try a different search word");
         return;
       }
       if(randomGalleryItem.is_album) {
@@ -379,64 +397,7 @@ function sendImage(recipientId, imageUrl) {
           url: imageUrl
         }
       },
-      "quick_replies":[
-        {
-          "content_type":"text",
-          "title":"Normal",
-          "payload":"   ",
-          "image_url":"http://i.imgur.com/vTstaG7.png"
-        },
-        {
-          "content_type":"text",
-          "title":"Dank",
-          "payload":"   ",
-          "image_url":"http://i.imgur.com/nE9A8zX.png"
-        },
-        {
-          "content_type":"text",
-          "title":"Random",
-          "payload":"   ",
-          "image_url":"http://i.imgur.com/mV7Diob.png"
-        }    
-      ]
-    }
-  }
-  logMessage(`--Sending image with url: ${imageUrl}`);
-  callSendAPI(messageData);
-}
-
-function sendImageWithButton(recipientId, imageUrl) {
-  var messageData = {
-    recipient: {
-      id: recipientId
-    },
-    "message":{
-      attachment: { 
-        type: "image",
-        payload: {
-          url: imageUrl
-        }
-      },
-      "quick_replies":[
-        {
-          "content_type":"text",
-          "title":"Normal",
-          "payload":"   ",
-          "image_url":"http://i.imgur.com/vTstaG7.png"
-        },
-        {
-          "content_type":"text",
-          "title":"Dank",
-          "payload":"   ",
-          "image_url":"http://i.imgur.com/nE9A8zX.png"
-        },
-        {
-          "content_type":"text",
-          "title":"Random",
-          "payload":"   ",
-          "image_url":"http://i.imgur.com/mV7Diob.png"
-        }    
-      ]
+      "quick_replies": GetQuickReplies()
     }
   }
   logMessage(`--Sending image with url: ${imageUrl}`);
@@ -452,8 +413,51 @@ function sendTextMessage(recipientId, messageText) {
       text: messageText
     }
   };
-
+  logMessage(`--Sending message with text and quick_replies: ${messageText}`);
   callSendAPI(messageData);
+}
+
+function sendTextWithCommands(recipientId, messageText) {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message:{
+      text: messageText,
+      "quick_replies": GetQuickReplies()
+    }
+  }
+  logMessage(`--Sending message with text and quick_replies: ${messageText}`);
+  callSendAPI(messageData);
+}
+
+function GetQuickReplies() {
+  return [
+    {
+      "content_type":"text",
+      "title":"Normal",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/vTstaG7.png"
+    },
+    {
+      "content_type":"text",
+      "title":"Dank",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/nE9A8zX.png"
+    },
+    {
+      "content_type":"text",
+      "title":"Random",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/mV7Diob.png"
+    },    
+    {
+      "content_type":"text",
+      "title":"Help",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/HrdBnhZ.png"
+    }    
+  ]
 }
 
 function callSendAPI(messageData) {
