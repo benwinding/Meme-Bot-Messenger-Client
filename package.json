@@ -20,6 +20,8 @@
   "homepage": "https://developers.facebook.com/docs/messenger-platform/guides/quick-start",
   "dependencies": {
     "request": "^2.72.0",
+    "jquery": "*",
+    "jsdom": "*",
     "express": "*",
     "body-parser": "*"
   }

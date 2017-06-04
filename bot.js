@@ -6,6 +6,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const request = require('request');
 const path = require('path');
+const jsdom = require("jsdom");
+const { JSDOM } = jsdom;
+const { document } = (new JSDOM(`...`)).window;
+var $ = require('jquery');
 var messengerButton = "<html><head><title>Facebook Messenger Bot</title></head><body><h1>Facebook Messenger Bot</h1>This is a bot based on Messenger Platform QuickStart. For more details, see their <a href=\"https://developers.facebook.com/docs/messenger-platform/guides/quick-start\">docs</a>.<footer id=\"gWidget\"></footer><script src=\"https://widget.glitch.me/widget.min.js\"></script></body></html>";
 const DEBUG = false;
 
@@ -88,12 +92,16 @@ function receivedMessage(event) {
       var firstTerm = messageTerms[0];
       if(textMatches(firstTerm, "meme"))
         sendMeme(senderID);
+      else if(textMatches(firstTerm, ":)"))
+        sendMeme(senderID);
       else if(textMatches(firstTerm, "👍"))
         sendMeme(senderID);
       else if(textMatches(firstTerm, "normal"))
         sendMeme(senderID);
-      else if(textMatches(messageText, "dank"))
+      else if(textMatches(messageText, "hot"))
         sendMemeDank(senderID);
+      else if(textMatches(messageText, "dank"))
+        sendDankReddit(senderID);
       else if(textMatches(firstTerm, "help"))
         sendHelp(senderID);
       else if(textMatches(firstTerm, "why"))
@@ -193,7 +201,7 @@ Try my buttons below!
 //////////////////////////
 
 function sendMemeDank(recipientId) {
-  var choice = getRandomNumber(1, 11);
+  var choice = getRandomNumberBiased(1, 11);
   switch (choice) {
     case 1:
     case 2:
@@ -214,20 +222,22 @@ function sendMemeDank(recipientId) {
 }
 
 function sendMeme(recipientId) {
-  var choice = getRandomNumber(1, 11);
+  var choice = getRandomNumberBiased(1, 12);
   switch(choice) {
     case 1: 
     case 2: 
     case 3: 
+      sendMemeDay(recipientId); break;
     case 4: 
     case 5: 
-      sendMemeWeek(recipientId); break;
     case 6: 
     case 7: 
+      sendMemeWeek(recipientId); break;
     case 8: 
-      sendMemeMonth(recipientId); break;
     case 9: 
     case 10: 
+      sendMemeMonth(recipientId); break;
+    case 11: 
       sendMemeYear(recipientId); break;
     default: 
       sendMemeAll(recipientId); break;
@@ -236,6 +246,10 @@ function sendMeme(recipientId) {
 
 function sendSearched(recipientId, searchTerm) {
   sendMemeSearched(recipientId, searchTerm);
+}
+
+function sendMemeDay(recipientId) {
+  sendMemeFunction(recipientId, 'day', 0, 20);
 }
 
 function sendMemeWeek(recipientId) {
@@ -254,10 +268,72 @@ function sendMemeAll(recipientId) {
   sendMemeFunction(recipientId, 'all', 3, 60);
 }
 
+//////////////////////////
+// Reddit Helpers
+//////////////////////////
+
+function sendDankReddit(recipientId) {
+  let oldestDankMeme = new Date("Feb 21 2016").getTime()/1000;
+  let todaysDate = Math.round(new Date().getTime()/1000.0);
+  let timestamp_random = getRandomDateBetween(oldestDankMeme, todaysDate);
+
+  // let urlStart = '1476373923';
+  // let urlEnd = '1476473923';
+  let urlStart = parseInt(timestamp_random);
+  let urlEnd = timestamp_random + 400000;
+  let urlReddit = `https://www.reddit.com/r/dankmemes/search?q=(and%20timestamp%3A${urlStart}..${urlEnd})&restrict_sr=on&sort=top&syntax=cloudsearch`;
+  logMessage(`Sending reddit request: ${urlReddit}`);
+
+  request({
+      url: urlReddit,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
+      }
+    },
+    function (error, response, body) {
+      if (response.statusCode != 200) {
+        logMessage(`!!!!!!! error: ${error}`);
+        logMessage(`!!!!!!! status code: ${response.statusCode}`);
+      }
+
+      let doc = document.createElement('div');
+      doc.innerHTML = body;
+
+      let contents = doc.getElementsByClassName("contents").item(0);
+      let randomResult = getRandomItemFromArray(contents.children);
+      let resultFooter = randomResult.getElementsByClassName('search-result-footer').item(0);
+      let imageLink = resultFooter.getElementsByTagName('a').item(0);
+      let imageUrl = imageLink.href;
+
+      let imageFile = ParseImageFile(imageUrl);
+
+      sendImage(recipientId, imageFile);
+    }
+  );
+}
+
+function getRandomDateBetween(dateStart, dateEnd) {
+  logMessage(`**********picking between time: ${dateStart} and ${dateEnd}`);
+  var randomNum = getRandomNumberEven(dateStart, dateEnd);
+  logMessage(`**********random num picked: ${randomNum}`);
+  return randomNum;
+}
+
+function ParseImageFile(imageUrl) {
+  if(imageUrl.slice(-4)[0] != ".")
+    return imageUrl + ".png";
+  else
+    return imageUrl;
+}
+
+//////////////////////////
+// Imgur Helpers
+//////////////////////////
+
 function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
 {
   request({
-      url: 'https://api.imgur.com/3/gallery/t/dump/top/' + timePeriod + '/' + randomIntFromInterval(0,pageLast),
+      url: 'https://api.imgur.com/3/gallery/t/dump/top/' + timePeriod + '/' + getRandomNumberEven(0,pageLast),
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
       }
@@ -283,7 +359,7 @@ function sendMemeFunction(recipientId, timePeriod, pageLast, itemsLast)
 function sendMemeFunctionSubReddit(recipientId, subReddit, timePeriod, pageLast, itemsLast)
 {
   request({
-      url: 'https://api.imgur.com/3/gallery/r/' + subReddit + '/top/' + timePeriod + '/' + randomIntFromInterval(0,pageLast),
+      url: 'https://api.imgur.com/3/gallery/r/' + subReddit + '/top/' + timePeriod + '/' + getRandomNumberEven(0,pageLast),
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
       }
@@ -339,9 +415,9 @@ function sendMemeSearched(recipientId, searchMeme, itemsLast)
   );
 }
 
-function sendMemeTEST(recipientId, message) {
-  sendMemeSearched(recipientId, 'dog', 10);
-}
+//////////////////////////
+// Messenger helpers
+//////////////////////////
 
 function sendRandom(recipientId) {
   request({
@@ -385,6 +461,10 @@ function sendRandomAlbumnImage(recipientId, id) {
   );
 }
 
+//////////////////////////
+// Messenger helpers
+//////////////////////////
+
 function sendImage(recipientId, imageUrl) {
   var messageData = {
     recipient: {
@@ -405,6 +485,8 @@ function sendImage(recipientId, imageUrl) {
 }
 
 function sendTextMessage(recipientId, messageText) {
+  if(messageText == null || messageText == "")
+    messageText = 'no message text';
   var messageData = {
     recipient: {
       id: recipientId
@@ -435,28 +517,35 @@ function GetQuickReplies() {
   return [
     {
       "content_type":"text",
-      "title":"Normal",
+      "title":":)",
       "payload":"   ",
       "image_url":"http://i.imgur.com/vTstaG7.png"
+    },
+    {
+      "content_type":"text",
+      "title":"Hot",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/5jtndzY.png"
     },
     {
       "content_type":"text",
       "title":"Dank",
       "payload":"   ",
       "image_url":"http://i.imgur.com/nE9A8zX.png"
-    },
-    {
-      "content_type":"text",
-      "title":"Random",
-      "payload":"   ",
-      "image_url":"http://i.imgur.com/mV7Diob.png"
     },    
     {
       "content_type":"text",
       "title":"Help",
       "payload":"   ",
+      "image_url":"http://i.imgur.com/mV7Diob.png"
+    },
+    {
+      "content_type":"text",
+      "title":"Random",
+      "payload":"   ",
       "image_url":"http://i.imgur.com/HrdBnhZ.png"
     }    
+
   ]
 }
 
@@ -485,12 +574,12 @@ function callSendAPI(messageData) {
 // Generic helpers
 //////////////////////////
 
-function getRandomNumber(minimum, maxmimum) {
-  return Math.floor(Math.exp(Math.random()*Math.log(maxmimum-minimum+2)))+minimum-1;
+function getRandomNumberBiased(minimum, maximum) {
+  return Math.floor(Math.exp(Math.random()*Math.log(maximum-minimum+2)))+minimum-1;
 }
 
-function randomIntFromInterval(min,max) {
-  return getRandomNumber(min, max);
+function getRandomNumberEven(minimum, maximum) {
+  return Math.floor(Math.random()*(maximum+1 - minimum))+minimum;
 }
 
 function textMatches(message, matchString) {
@@ -498,14 +587,14 @@ function textMatches(message, matchString) {
 }
 
 function getRandomItemFromArray(items) {
-  var random_item = items[getRandomNumber(0, items.length - 1)];
+  var random_item = items[getRandomNumberEven(0, items.length - 1)];
   return random_item;
 }
 
 function removeString(strArray) {
   var index = strArray.indexOf(strArray);
   if(index != -1)
-      strArray.splice(index, 1);
+    strArray.splice(index, 1);
 }
 
 function getLongestString(strArray) {
