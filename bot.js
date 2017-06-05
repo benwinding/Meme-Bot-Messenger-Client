@@ -313,9 +313,7 @@ function sendDankReddit(recipientId) {
 }
 
 function getRandomDateBetween(dateStart, dateEnd) {
-  logMessage(`**********picking between time: ${dateStart} and ${dateEnd}`);
   var randomNum = getRandomNumberEven(dateStart, dateEnd);
-  logMessage(`**********random num picked: ${randomNum}`);
   return randomNum;
 }
 
