@@ -561,7 +561,8 @@ function callSendAPI(messageData) {
 
       logMessage(`Successfully sent generic message with id ${messageId} to recipient ${recipientId}`); 
     } else {
-      logMessage("Unable to send message"); 
+      logMessage("Unable to send message");
+      sendMeme(recipientId);
       logMessage(response);
       logMessage(error);
     }
