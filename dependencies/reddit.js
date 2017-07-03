@@ -1,56 +1,93 @@
-const bodyParser = require('body-parser');
-const request = require('request');
 const path = require('path');
-const jsdom = require("jsdom");
-const { JSDOM } = jsdom;
-const { document } = (new JSDOM(`...`)).window;
-var $ = require('jquery');
+const rp = require('request-promise-native');
+const parse  = require('url-parse');
+const cheerio = require('cheerio');
+var $;
 
 const hlpr = require('./helpers');
-const messenger = require('./messenger');
 
 //////////////////////////
 // Reddit Helpers
 //////////////////////////
 
-exports.sendDankReddit = function sendDankReddit(recipientId) {
-  let oldestDankMeme = new Date("Feb 21 2016").getTime()/1000;
-  let todaysDate = Math.round(new Date().getTime()/1000.0);
-  let timestamp_random = getRandomDateBetween(oldestDankMeme, todaysDate-400000);
+exports.GetRedditSubReddit = (subReddit, fromDate, daysGap) => {
+  hlpr.log("Getting image from subreddit: " + subReddit);
+  let utcGap = daysGap*24*60*60;
 
-  // let urlStart = '1476373923';
-  // let urlEnd = '1476473923';
+  let oldestDankMeme = new Date(fromDate).getTime()/1000;
+  let todaysDate = Math.round(new Date().getTime()/1000.0) - utcGap;
+  let timestamp_random = getRandomDateBetween(oldestDankMeme, todaysDate);
+  return new Promise((resolve, reject) => {
+    resolve(QuerySubReddit(subReddit, timestamp_random, utcGap));
+  })
+}
+
+exports.GetRedditSubReddit = (subReddit, fromDate, daysGap, toDate) => {
+  hlpr.log("Getting image from subreddit: " + subReddit);
+  let utcGap = daysGap*24*60*60;
+
+  let oldestDankMeme = new Date(fromDate).getTime()/1000;
+  let todaysDate = new Date(fromDate).getTime()/1000 - utcGap;
+  let timestamp_random = getRandomDateBetween(oldestDankMeme, todaysDate);
+  return new Promise((resolve, reject) => {
+    resolve(QuerySubReddit(subReddit, timestamp_random, utcGap));
+  })
+}
+
+function QuerySubReddit(subReddit, timestamp_random, utcGap) {
   let urlStart = parseInt(timestamp_random);
-  let urlEnd = timestamp_random + 400000;
-  let urlReddit = `https://www.reddit.com/r/dankmemes/search?q=(and%20timestamp%3A${urlStart}..${urlEnd})&restrict_sr=on&sort=top&syntax=cloudsearch`;
-  hlpr.logMessage(`Sending reddit request: ${urlReddit}`);
-
-  request({
+  let urlEnd = timestamp_random + utcGap;
+  let urlReddit = `https://www.reddit.com/r/${subReddit}/search?q=(and%20timestamp%3A${urlStart}..${urlEnd})&restrict_sr=on&sort=top&syntax=cloudsearch`;
+  
+  return new Promise((resolve, reject) => {
+    hlpr.log("Url Requset: " + urlReddit);
+    rp({
       url: urlReddit,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
       }
-    },
-    function (error, response, body) {
-      if (response.statusCode != 200) {
-        hlpr.logMessage(`!!!!!!! error: ${error}`);
-        hlpr.logMessage(`!!!!!!! status code: ${response.statusCode}`);
-      }
+    })
+    .then((body) => GetRandomImageFromResults(body))
+    .then((url) => ParseImageFile(url))
+    .then((urlParsed) => resolve(urlParsed))
+    .catch((err) => {
+      hlpr.log("!!! Error: " + err);
+      hlpr.log("    Failed getting images from subreddit: " + subReddit);
+      hlpr.log(`    from: ${hlpr.getDate(urlStart * 1000)} --- to: ${hlpr.getDate(urlEnd * 1000)}` );
+      reject();
+    });
+  })
+}
 
-      let doc = document.createElement('div');
-      doc.innerHTML = body;
-
-      let contents = doc.getElementsByClassName("contents").item(0);
-      let randomResult = hlpr.getRandomItemFromArray(contents.children);
-      let resultFooter = randomResult.getElementsByClassName('search-result-footer').item(0);
-      let imageLink = resultFooter.getElementsByTagName('a').item(0);
-      let imageUrl = imageLink.href;
-
-      let imageFile = ParseImageFile(imageUrl);
-
-      messenger.sendImage(recipientId, imageFile);
+function GetRandomImageFromResults(body) {
+  return new Promise((resolve, reject) => {
+    $ = cheerio.load(body);
+    let contents = $("div.contents").find('.search-result-footer')
+      .find('a')
+    if(contents == null || contents.length == 0) {
+      hlpr.log("Reject: Couldn't get images from subreddit");
+      reject();
     }
-  );
+    else{
+      let random = hlpr.getRandomItemFromArray(contents);
+      let url = random.attribs.href;
+      hlpr.log("Picking image: " + url);
+      resolve(url);
+    }
+  })
+}
+
+function GetContentsFromBody(body) {
+  return new Promise((resolve, reject) => {
+    $ = cheerio.load(body);
+    let contents = $("div.contents").find('.search-result-footer')
+      .find('a')[0].innerText;
+    if(contents.length > 0){
+      resolve(contents.children(0));
+    }
+    else
+      reject();
+  })
 }
 
 function getRandomDateBetween(dateStart, dateEnd) {
@@ -59,8 +96,24 @@ function getRandomDateBetween(dateStart, dateEnd) {
 }
 
 function ParseImageFile(imageUrl) {
-  if(imageUrl.slice(-4)[0] != ".")
-    return imageUrl + ".png";
-  else
-    return imageUrl;
+  let urlObj = new parse(imageUrl);
+  var ext = path.extname(imageUrl);
+  hlpr.log("Parsing image: " + imageUrl);
+  return new Promise((resolve, reject) => {
+    if(imageUrl == null) {
+      reject();
+    }
+    else if(urlObj.hostname == "gfycat.com") {
+      urlObj.set("hostname", "fat.gfycat.com");
+      urlObj.set("pathname", urlObj.pathname + ".webm");
+      resolve(urlObj.href);
+    }
+    else if(ext == ".gifv") {
+      urlObj.set("pathname", urlObj.pathname.slice(0,-5) + ".gif");
+      resolve(urlObj.href);
+    }
+    else
+      resolve(urlObj.href);
+    reject();
+  })
 }

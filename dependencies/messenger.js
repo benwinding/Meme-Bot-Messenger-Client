@@ -1,30 +1,34 @@
-const request = require('request');
 const hlpr = require('./helpers');
+const rp = require('request-promise-native');
 
-//////////////////////////
-// Messenger helpers
-//////////////////////////
-
-exports.sendImage = function sendImage(recipientId, imageUrl) {
+exports.SendImage = (recipientId, imageUrl) => {
   var messageData = {
     recipient: {
       id: recipientId
     },
-    "message":{
+    message:{
       attachment: { 
         type: "image",
         payload: {
           url: imageUrl
         }
       },
-      "quick_replies": GetQuickReplies()
+      quick_replies: GetQuickReplies()
     }
   }
-  hlpr.logMessage(`--Sending image with url: ${imageUrl}`);
-  callSendAPI(messageData);
+  return new Promise((resolve, reject) => {
+    hlpr.log(`--Sending image with url: ${imageUrl}`);
+    callSendAPI(messageData)
+    .then(() => {
+      resolve();
+    })
+    .catch(() => {
+      reject();
+    })
+  })
 }
 
-exports.sendTextWithCommands = function sendTextWithCommands(recipientId, messageText) {
+exports.SendText = (recipientId, messageText) => {
   if(messageText == null || messageText == "")
     messageText = "";
   var messageData = {
@@ -36,8 +40,43 @@ exports.sendTextWithCommands = function sendTextWithCommands(recipientId, messag
       "quick_replies": GetQuickReplies()
     }
   }
-  hlpr.logMessage(`--Sending message with text and quick_replies: ${messageText}`);
-  callSendAPI(messageData);
+  return new Promise((resolve, reject) => {
+    hlpr.log(`--Sending message with text and quick_replies: ${messageText}`);
+    callSendAPI(messageData)
+    .then(() => {
+      resolve();
+    })
+    .catch(() => {
+      reject();
+    })
+  })
+}
+
+exports.SendVideo = (recipientId, imageUrl) => {
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message:{
+      attachment: { 
+        type: "video",
+        payload: {
+          url: imageUrl
+        }
+      },
+      quick_replies: GetQuickReplies()
+    }
+  }
+  return new Promise((resolve, reject) => {
+    hlpr.log(`--Sending video with url: ${imageUrl}`);
+    callSendAPI(messageData)
+    .then(() => {
+      resolve();
+    })
+    .catch(() => {
+      reject();
+    })
+  })
 }
 
 /// Privates
@@ -70,33 +109,43 @@ function GetQuickReplies() {
     },
     {
       "content_type":"text",
-      "title":"Random",
+      "title":"mild",
       "payload":"   ",
       "image_url":"http://i.imgur.com/HrdBnhZ.png"
+    },
+    {
+      "content_type":"text",
+      "title":"wild",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/M1k4gZi.png"
     }    
 
   ]
 }
 
 function callSendAPI(messageData) {
-  request({
-    uri: 'https://graph.facebook.com/v2.6/me/messages',
-    qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
-    method: 'POST',
-    json: messageData
+  return new Promise((resolve, reject) => {
+    var recipientId = getUserId(messageData.recipient.id);
+    rp({
+      uri: 'https://graph.facebook.com/v2.6/me/messages',
+      qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
+      method: 'POST',
+      json: messageData
+    })
+    .then(() => {
+      hlpr.log(`Successfully sent message to recipient ${recipientId}`); 
+      resolve();
+    })
+    .catch(() => {
+      hlpr.log(`Message failed to send to id: ${recipientId}`); 
+      reject();
+    });
+  }) 
+}
 
-  }, function (error, response, body) {
-    if (!error && response.statusCode == 200) {
-      var recipientId = body.recipient_id;
-      var messageId = body.message_id;
-
-      hlpr.logMessage(`Successfully sent generic message with id ${messageId} to recipient ${recipientId}`);      
-      hlpr.logMessage(`Message Object ${JSON.stringify(body, null, 2)}`);      
-    } else {
-      hlpr.logMessage("Unable to send message");
-      // sendMeme(recipientId);
-      hlpr.logMessage(response);
-      hlpr.logMessage(error);
-    }
-  });  
+function getUserId(recipientId) {
+  if(recipientId == 1300350910054687)
+    return "BENNY"
+  else
+    return recipientId;
 }
