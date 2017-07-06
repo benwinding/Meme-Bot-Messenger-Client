@@ -5,9 +5,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const rp = require('request-promise-native');
-const hlpr = require('./dependencies/helpers');
-const messenger = require('./dependencies/messenger');
-const prsr = require('./dparsers');
+const hlpr = require('./helpers');
+const prsr = require('./parsers/cmnds');
+const urls = require('./parsers/path-parser');
+const dpar = require('./parsers/dparsers');
+const messenger = require('./repositories/messenger');
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -16,6 +18,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+// 522466234751069
+// 521529374844755
+
+
 
 // Webhook validation
 app.get('/webhook', function(req, res) {
@@ -69,55 +75,53 @@ function receivedMessage(event) {
   var messageId = message.mid;
   var messageText = message.text;
   var messageAttachments = message.attachments;
-  var commandRecieved = "";
   
-  prsr.ParseImageCommand(messageText)
-  .then((command) => {
-    commandRecieved = command;
-    prsr.GetImageFromCommand(commandRecieved)
-    .then((url) => prsr.ValidateUrl(url))
-    .then((validatedUrl) => {
-      if(prsr.IsVideo(validatedUrl)) {
-        messenger.SendVideo(senderID, validatedUrl)
-        .then(() => IncrementCounter(commandRecieved))
+  var commandParsed = prsr.ParseCommand(messageText);
+  
+  if(prsr.IsTextRequest(commandParsed)) {
+    dpar.GetTextFromCommand(commandParsed)
+    .then((textMessage) => messenger.SendText(senderID, textMessage))    
+    .then(() => IncrementCounter(commandParsed))
+    return;
+  }
+  // Try send three times
+  TrySendMeme(senderID, commandParsed)
+  .catch(() => TrySendMeme(senderID, commandParsed))
+  .catch(() => TrySendMeme(senderID, commandParsed))
+  .catch(() => SendSafeMeme(senderID));
+}
+
+function TrySendMeme(senderID, commandRecieved){
+  return new Promise((resolve,reject) => {
+    dpar.GetImageFromCommand(commandRecieved)
+    .then((Url) => {
+      if(urls.IsVideo(Url)) {
+        messenger.SendVideo(senderID, Url)
+        .then(() => resolve(IncrementCounter(commandRecieved)))
         .catch((err) => {
-          hlpr.log(`Error1: ${err}, command: ${commandRecieved} didn't work, sending safe image`);
-          SendSafeMeme(senderID);
+          hlpr.log(`Error1: ${err}`);
+          reject();
         });
       }
       else {
-        messenger.SendImage(senderID, validatedUrl)
-        .then(() => IncrementCounter(commandRecieved))
+        messenger.SendImage(senderID, Url)
+        .then(() => resolve(IncrementCounter(commandRecieved)))
         .catch((err) => {
-          prsr.GetImageFromCommand(commandRecieved)
-          .then((url) => prsr.ValidateUrl(url))
-          .then((validatedUrl) => messenger.SendImage(senderID, validatedUrl))          
-          .then(() => IncrementCounter(commandRecieved))
-          .catch((err) => {
-            hlpr.log(`Error2: ${err}, command: ${commandRecieved} didn't work, sending safe image`);
-            SendSafeMeme(senderID);
-          });
+          hlpr.log(`Error2: ${err}`);
+          reject();
         });
       }
     })
     .catch((err) => {
-      hlpr.log(`Error3: ${err}, command: ${commandRecieved} didn't work, sending safe image`);
-      SendSafeMeme(senderID);
-    });
-  })
-  .catch((err) => {
-    prsr.GetTextFromCommand(messageText)
-    .then((command) => messenger.SendText(senderID, command))
-    .then(() => IncrementCounter("welcome"))
-    .catch((err) => {
-      hlpr.log(`Error4: ${err}, command: ${commandRecieved} didn't work, sending safe image`);
-      SendSafeMeme(senderID);
+      hlpr.log(`Error3: ${err}`);
+      reject();
     });
   });
 }
 
 function SendSafeMeme(senderID) {
-  prsr.GetImageFromCommand("meme")
+  hlpr.log(`Error: Things must have failed alot, Sending reliable image`);
+  dpar.GetImageFromCommand("meme")
   .then((validUrl) => messenger.SendImage(senderID, validUrl))
   .then(() => {
     IncrementCounter("meme");
