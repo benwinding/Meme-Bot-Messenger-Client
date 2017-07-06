@@ -1,4 +1,4 @@
-const hlpr = require('../dependencies/helpers');
+const hlpr = require('../helpers');
 const path = require('path');
 
 exports.IsTextRequest = (input) => {
@@ -42,4 +42,5 @@ exports.ParseCommand = (input) => {
       }
     }
   }
+  return "meme";
 }

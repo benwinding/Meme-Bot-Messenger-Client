@@ -4,7 +4,7 @@ const parse  = require('url-parse');
 const cheerio = require('cheerio');
 var $;
 
-const hlpr = require('./helpers');
+const hlpr = require('../helpers');
 
 //////////////////////////
 // Reddit Helpers
@@ -22,12 +22,12 @@ exports.GetRedditSubReddit = (subReddit, fromDate, daysGap) => {
   })
 }
 
-exports.GetRedditSubReddit = (subReddit, fromDate, daysGap, toDate) => {
+exports.GetRedditSubRedditRange = (subReddit, fromDate, daysGap, toDate) => {
   hlpr.log("Getting image from subreddit: " + subReddit);
   let utcGap = daysGap*24*60*60;
 
   let oldestDankMeme = new Date(fromDate).getTime()/1000;
-  let todaysDate = new Date(fromDate).getTime()/1000 - utcGap;
+  let todaysDate = new Date(toDate).getTime()/1000 - utcGap;
   let timestamp_random = getRandomDateBetween(oldestDankMeme, todaysDate);
   return new Promise((resolve, reject) => {
     resolve(QuerySubReddit(subReddit, timestamp_random, utcGap));
@@ -69,6 +69,7 @@ function GetRandomImageFromResults(body) {
       reject();
     }
     else{
+      hlpr.log(`Found: ${contents.length} images`);
       let random = hlpr.getRandomItemFromArray(contents);
       let url = random.attribs.href;
       hlpr.log("Picking image: " + url);

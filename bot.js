@@ -5,11 +5,11 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const rp = require('request-promise-native');
-const hlpr = require('./dependencies/helpers');
-const messenger = require('./dependencies/messenger');
+const hlpr = require('./helpers');
 const prsr = require('./parsers/cmnds');
-const urls = require('./parsers/urls');
-const dpar = require('./dparsers');
+const urls = require('./parsers/path-parser');
+const dpar = require('./parsers/dparsers');
+const messenger = require('./repositories/messenger');
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -18,6 +18,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
+// 522466234751069
+// 521529374844755
+
+
 
 // Webhook validation
 app.get('/webhook', function(req, res) {
@@ -80,22 +84,19 @@ function receivedMessage(event) {
     .then(() => IncrementCounter(commandParsed))
     return;
   }
+  // Try send three times
   TrySendMeme(senderID, commandParsed)
-  .catch(() => {
-    TrySendMeme(senderID, commandParsed)
-    .catch(() => {
-      SendSafeMeme();
-    })
-  })
+  .catch(() => TrySendMeme(senderID, commandParsed))
+  .catch(() => TrySendMeme(senderID, commandParsed))
+  .catch(() => SendSafeMeme(senderID));
 }
 
 function TrySendMeme(senderID, commandRecieved){
   return new Promise((resolve,reject) => {
     dpar.GetImageFromCommand(commandRecieved)
-    .then((url) => urls.ValidateUrl(url))
-    .then((validatedUrl) => {
-      if(urls.IsVideo(validatedUrl)) {
-        messenger.SendVideo(senderID, validatedUrl)
+    .then((Url) => {
+      if(urls.IsVideo(Url)) {
+        messenger.SendVideo(senderID, Url)
         .then(() => resolve(IncrementCounter(commandRecieved)))
         .catch((err) => {
           hlpr.log(`Error1: ${err}`);
@@ -103,7 +104,7 @@ function TrySendMeme(senderID, commandRecieved){
         });
       }
       else {
-        messenger.SendImage(senderID, validatedUrl)
+        messenger.SendImage(senderID, Url)
         .then(() => resolve(IncrementCounter(commandRecieved)))
         .catch((err) => {
           hlpr.log(`Error2: ${err}`);
@@ -119,7 +120,8 @@ function TrySendMeme(senderID, commandRecieved){
 }
 
 function SendSafeMeme(senderID) {
-  prsr.GetImageFromCommand("meme")
+  hlpr.log(`Error: Things must have failed alot, Sending reliable image`);
+  dpar.GetImageFromCommand("meme")
   .then((validUrl) => messenger.SendImage(senderID, validUrl))
   .then(() => {
     IncrementCounter("meme");

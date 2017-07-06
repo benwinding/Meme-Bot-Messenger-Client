@@ -1,6 +1,6 @@
-const imgur = require('./dependencies/imgur');
-const reddit = require('./dependencies/reddit');
-const hlpr = require('./dependencies/helpers');
+const imgur = require('./repositories/imgur');
+const reddit = require('./repositories/reddit');
+const hlpr = require('./helpers');
 const cmds = require('./parsers/cmnds');
 
 exports.GetImgurSubreddit = (imgursubreddit) => {
@@ -33,8 +33,8 @@ exports.getWild = () => {
     switch(choice) {
       case 1: 
       case 2: 
+        resolve(reddit.GetRedditSubRedditRange("SFWPornGifs", "Sep 17 2014", 30, "Feb 17 2016"));break;
       case 3: 
-        resolve(reddit.GetRedditSubReddit("SFWPornGifs", "Sep 17 2014", 50, "Feb 17 2016"));break;
       case 4: 
       case 5: 
       case 6: 
@@ -44,7 +44,7 @@ exports.getWild = () => {
       case 10: 
       case 11: 
       default: 
-        resolve(reddit.GetRedditSubReddit("gonecivil", "Sep 17 2013", 80));break;
+        resolve(reddit.GetRedditSubReddit("gonecivil", "Sep 17 2013", 10));break;
     }
     reject();
   })

@@ -1,4 +1,4 @@
-const hlpr = require('./helpers');
+const hlpr = require('../helpers');
 const rp = require('request-promise-native');
 
 exports.SendImage = (recipientId, imageUrl) => {
