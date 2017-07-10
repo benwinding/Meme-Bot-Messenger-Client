@@ -5,13 +5,13 @@ const rp = require('request-promise-native');
 exports.ValidateUrl = (url) => {
   hlpr.log("validating url: " + url);
   return new Promise(function (resolve, reject) {
-    var options = {
+    const options = {
       method: 'HEAD',
       uri: url
     };
     rp(options)
     .then(() => { 
-      hlpr.log("valid url!")
+      hlpr.log("valid url!");
       resolve(url) 
     })
     .catch((error) => {
@@ -19,10 +19,10 @@ exports.ValidateUrl = (url) => {
       reject(error)
     });
   });
-}
+};
 
 exports.IsVideo = (url) => {
-  var ext = path.extname(url);
+  const ext = path.extname(url);
   switch(ext) {
     case ".webm":
       return true;
@@ -31,4 +31,4 @@ exports.IsVideo = (url) => {
     default:
       return false;
   }
-}
+};

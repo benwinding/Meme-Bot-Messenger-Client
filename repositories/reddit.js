@@ -2,7 +2,7 @@ const path = require('path');
 const rp = require('request-promise-native');
 const parse  = require('url-parse');
 const cheerio = require('cheerio');
-var $;
+let $;
 
 const hlpr = require('../helpers');
 
@@ -20,7 +20,7 @@ exports.GetRedditSubReddit = (subReddit, fromDate, daysGap) => {
   return new Promise((resolve, reject) => {
     resolve(QuerySubReddit(subReddit, timestamp_random, utcGap));
   })
-}
+};
 
 exports.GetRedditSubRedditRange = (subReddit, fromDate, daysGap, toDate) => {
   hlpr.log("Getting image from subreddit: " + subReddit);
@@ -32,7 +32,7 @@ exports.GetRedditSubRedditRange = (subReddit, fromDate, daysGap, toDate) => {
   return new Promise((resolve, reject) => {
     resolve(QuerySubReddit(subReddit, timestamp_random, utcGap));
   })
-}
+};
 
 function QuerySubReddit(subReddit, timestamp_random, utcGap) {
   let urlStart = parseInt(timestamp_random);
@@ -63,7 +63,7 @@ function GetRandomImageFromResults(body) {
   return new Promise((resolve, reject) => {
     $ = cheerio.load(body);
     let contents = $("div.contents").find('.search-result-footer')
-      .find('a')
+      .find('a');
     if(contents == null || contents.length == 0) {
       hlpr.log("Reject: Couldn't get images from subreddit");
       reject();
@@ -92,13 +92,13 @@ function GetContentsFromBody(body) {
 }
 
 function getRandomDateBetween(dateStart, dateEnd) {
-  var randomNum = hlpr.getRandomNumberEven(dateStart, dateEnd);
+  const randomNum = hlpr.getRandomNumberEven(dateStart, dateEnd);
   return randomNum;
 }
 
 function ParseImageFile(imageUrl) {
   let urlObj = new parse(imageUrl);
-  var ext = path.extname(imageUrl);
+  const ext = path.extname(imageUrl);
   hlpr.log("Parsing image: " + imageUrl);
   return new Promise((resolve, reject) => {
     if(imageUrl == null) {

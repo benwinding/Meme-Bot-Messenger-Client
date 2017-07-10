@@ -37,7 +37,7 @@ app.get('/webhook', function(req, res) {
 
 // Display the web page
 app.get('/', function(req, res) {
-  var messengerButton = "<html><head><title>Facebook Messenger Bot</title></head><body><h1>Facebook Messenger Bot</h1>This is a bot based on Messenger Platform QuickStart. For more details, see their <a href=\"https://developers.facebook.com/docs/messenger-platform/guides/quick-start\">docs</a>.<footer id=\"gWidget\"></footer><script src=\"https://widget.glitch.me/widget.min.js\"></script></body></html>";
+  const messengerButton = "<html><head><title>Facebook Messenger Bot</title></head><body><h1>Facebook Messenger Bot</h1>This is a bot based on Messenger Platform QuickStart. For more details, see their <a href=\"https://developers.facebook.com/docs/messenger-platform/guides/quick-start\">docs</a>.<footer id=\"gWidget\"></footer><script src=\"https://widget.glitch.me/widget.min.js\"></script></body></html>";
   res.writeHead(200, {'Content-Type': 'text/html'});
   res.write(messengerButton);
   res.end();
@@ -45,12 +45,12 @@ app.get('/', function(req, res) {
 
 // Message processing
 app.post('/webhook', function (req, res) {
-  var data = req.body;
+  const data = req.body;
   hlpr.log("Data: " + data);
   if (data.object === 'page') {
     data.entry.forEach(function(entry) {
-      var pageID = entry.id;
-      var timeOfEvent = entry.time;
+      let pageID = entry.id;
+      let timeOfEvent = entry.time;
       entry.messaging.forEach(function(event) {
         if (event.message) {
           receivedMessage(event);
@@ -65,18 +65,18 @@ app.post('/webhook', function (req, res) {
 
 // Incoming events handling
 function receivedMessage(event) {
-  var senderID = event.sender.id;
-  var recipientID = event.recipient.id;
-  var timeOfMessage = event.timestamp;
-  var message = event.message;
+  const senderID = event.sender.id;
+  let recipientID = event.recipient.id;
+  let timeOfMessage = event.timestamp;
+  const message = event.message;
 
   hlpr.log(`Received message from user ${senderID}, with message: ${message.text}`);
 
-  var messageId = message.mid;
-  var messageText = message.text;
-  var messageAttachments = message.attachments;
+  let messageId = message.mid;
+  const messageText = message.text;
+  let messageAttachments = message.attachments;
   
-  var commandParsed = prsr.ParseCommand(messageText);
+  const commandParsed = prsr.ParseCommand(messageText);
   
   if(prsr.IsTextRequest(commandParsed)) {
     dpar.GetTextFromCommand(commandParsed)
@@ -134,7 +134,7 @@ function SendSafeMeme(senderID) {
 
 function IncrementCounter(label) {
   hlpr.log('Incrementing counter: ' + label);
-  var url = 'https://butter-goal.glitch.me/increment/' + label;
+  const url = 'https://butter-goal.glitch.me/increment/' + label;
   return new Promise((resolve, reject) => {
     rp({
       uri: url,
@@ -148,6 +148,6 @@ function IncrementCounter(label) {
 }
 
 // Set Express to listen out for HTTP requests
-var server = app.listen(process.env.PORT || 3000, function () {
+const server = app.listen(process.env.PORT || 3000, function () {
   hlpr.log(`Listening on port ${server.address().port}`);
 });

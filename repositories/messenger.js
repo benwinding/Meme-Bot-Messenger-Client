@@ -2,12 +2,12 @@ const hlpr = require('../helpers');
 const rp = require('request-promise-native');
 
 exports.SendImage = (recipientId, imageUrl) => {
-  var messageData = {
+  const messageData = {
     recipient: {
       id: recipientId
     },
-    message:{
-      attachment: { 
+    message: {
+      attachment: {
         type: "image",
         payload: {
           url: imageUrl
@@ -15,7 +15,7 @@ exports.SendImage = (recipientId, imageUrl) => {
       },
       quick_replies: GetQuickReplies()
     }
-  }
+  };
   return new Promise((resolve, reject) => {
     hlpr.log(`--Sending image with url: ${imageUrl}`);
     callSendAPI(messageData)
@@ -26,20 +26,20 @@ exports.SendImage = (recipientId, imageUrl) => {
       reject();
     })
   })
-}
+};
 
 exports.SendText = (recipientId, messageText) => {
   if(messageText == null || messageText == "")
     messageText = "";
-  var messageData = {
+  const messageData = {
     recipient: {
       id: recipientId
     },
-    message:{
+    message: {
       text: messageText,
       "quick_replies": GetQuickReplies()
     }
-  }
+  };
   return new Promise((resolve, reject) => {
     hlpr.log(`--Sending message with text and quick_replies: ${messageText}`);
     callSendAPI(messageData)
@@ -50,15 +50,15 @@ exports.SendText = (recipientId, messageText) => {
       reject();
     })
   })
-}
+};
 
 exports.SendVideo = (recipientId, imageUrl) => {
-  var messageData = {
+  const messageData = {
     recipient: {
       id: recipientId
     },
-    message:{
-      attachment: { 
+    message: {
+      attachment: {
         type: "video",
         payload: {
           url: imageUrl
@@ -66,7 +66,7 @@ exports.SendVideo = (recipientId, imageUrl) => {
       },
       quick_replies: GetQuickReplies()
     }
-  }
+  };
   return new Promise((resolve, reject) => {
     hlpr.log(`--Sending video with url: ${imageUrl}`);
     callSendAPI(messageData)
@@ -77,7 +77,7 @@ exports.SendVideo = (recipientId, imageUrl) => {
       reject();
     })
   })
-}
+};
 
 /// Privates
 
@@ -125,7 +125,7 @@ function GetQuickReplies() {
 
 function callSendAPI(messageData) {
   return new Promise((resolve, reject) => {
-    var recipientId = getUserId(messageData.recipient.id);
+    const recipientId = getUserId(messageData.recipient.id);
     rp({
       uri: 'https://graph.facebook.com/v2.6/me/messages',
       qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
@@ -145,7 +145,7 @@ function callSendAPI(messageData) {
 
 function getUserId(recipientId) {
   if(recipientId == 1300350910054687)
-    return "BENNY"
+    return "BENNY";
   else
     return recipientId;
 }
