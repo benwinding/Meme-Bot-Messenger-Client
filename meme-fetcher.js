@@ -3,6 +3,28 @@ const reddit = require('./repositories/reddit');
 const hlpr = require('./helpers');
 const cmds = require('./parsers/cmnds');
 
+exports.GetHot = (imgursubreddit) => {
+  return new Promise((resolve, reject) => {
+    var choice = hlpr.getRandomNumberBiased(1, 11);
+    switch (choice) {
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+        resolve(exports.GetImgurSubreddit("MemeEconomy"));break;
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      default:
+        resolve(exports.GetImgurSubreddit("dankmemes"));break;
+    }
+    reject();
+  });
+}
+
 exports.GetImgurSubreddit = (imgursubreddit) => {
   return new Promise((resolve, reject) => {
     var choice = hlpr.getRandomNumberBiased(1, 11);

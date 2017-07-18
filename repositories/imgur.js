@@ -14,7 +14,8 @@ exports.GetRandomImage = function () {
     .then((body) => { 
       const parsed = JSON.parse(body);
       GetImageFromResponse(parsed.data, 2)
-      .then(resolve);
+      .then(resolve)
+      .catch(reject);
     })
     .catch(reject);
   }) 
@@ -55,7 +56,8 @@ exports.GetSubRedditImage = (subReddit, timePeriod, pageLast, itemsLast) => {
       hlpr.log(`--Finding memes in 'subreddit' subReddit:${subReddit}, time: ${timePeriod}, pages:${pageLast}, numItems:${itemsLast}`);
       hlpr.log(`--Found: ${galleryResponse.data.length}, albumns or single images`);
       GetImageFromResponse(galleryResponse.data, itemsLast)
-      .then(resolve);
+      .then(resolve)
+      .catch(reject);
     })
     .catch(reject);
   }) 
@@ -74,8 +76,10 @@ exports.sendMemeSearched = (recipientId, searchMeme, itemsLast) => {
       const galleryResponse = JSON.parse(body);
       if(galleryResponse.data.length == 0)
         reject();
-      GetImageFromResponse(galleryResponse.data, itemsLast)
-      .then(resolve);
+      else {
+        GetImageFromResponse(galleryResponse.data, itemsLast)
+        .then(resolve);
+      }
     })
     .catch(reject);
   }) 
@@ -86,7 +90,10 @@ function GetImageFromResponse(list, itemsLast) {
     const firstBest = list.slice(0, itemsLast);
     const randomGalleryItem = hlpr.getRandomItemFromArray(firstBest);
     let imgUrl;
-    if(randomGalleryItem.is_album) {
+    if(randomGalleryItem == null) {
+      reject();
+    }
+    else if(randomGalleryItem.is_album) {
       GetRandomAlbumnImage(randomGalleryItem.id)
       .then((url) => {resolve(url)})
       .catch(reject);              
