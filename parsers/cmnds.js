@@ -1,6 +1,10 @@
 const hlpr = require('../helpers');
 const path = require('path');
 
+/**
+ * @return {boolean}
+ * @return {boolean}
+ */
 exports.IsTextRequest = (input) => {
   if(input == undefined)
     input = "";
@@ -31,6 +35,10 @@ exports.IsShareRequest = (input) => {
   }
 }
 
+/**
+ * @return {string}
+ * @return {string}
+ */
 exports.ParseCommand = (input) => {
   var commandAliases = {
     "meme" : ["meme","normal",":)", "👍", "", null, undefined],
