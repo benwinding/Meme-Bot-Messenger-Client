@@ -1,10 +1,6 @@
 const hlpr = require('../helpers');
 const path = require('path');
 
-/**
- * @return {boolean}
- * @return {boolean}
- */
 exports.IsTextRequest = (input) => {
   if(input == undefined)
     input = "";
@@ -17,15 +13,24 @@ exports.IsTextRequest = (input) => {
       hlpr.log("Command is text request");
       return true;
     default:
-      hlpr.log("Command is image request");
       return false;
   }
 }
 
-/**
- * @return {string}
- * @return {string}
- */
+exports.IsShareRequest = (input) => {
+  if(input == undefined)
+    input = "";
+  let inputLower = input.toLowerCase();
+  switch(inputLower) {
+    case "share":
+      hlpr.log("Command is share request");
+      return true;
+    default:
+      hlpr.log("Command is probably image request");
+      return false;
+  }
+}
+
 exports.ParseCommand = (input) => {
   var commandAliases = {
     "meme" : ["meme","normal",":)", "👍", "", null, undefined],
@@ -37,6 +42,7 @@ exports.ParseCommand = (input) => {
     "how" : ["how"], 
     "welcome" : ["welcome"], 
     "help" : ["help"],
+    "share" : ["share"],
   }  
   if(input == undefined)
     input = "";

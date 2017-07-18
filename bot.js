@@ -81,7 +81,12 @@ function receivedMessage(event) {
   if(prsr.IsTextRequest(commandParsed)) {
     dpar.GetTextFromCommand(commandParsed)
     .then((textMessage) => messenger.SendText(senderID, textMessage))    
-    .then(() => IncrementCounter(commandParsed))
+    .then(() => IncrementCounter(commandParsed));
+    return;
+  }
+  if(prsr.IsShareRequest(commandParsed)) {
+    messenger.SendShareMe(senderID)   
+    .then(() => IncrementCounter(commandParsed));
     return;
   }
   // Try send three times

@@ -28,6 +28,42 @@ exports.SendImage = (recipientId, imageUrl) => {
   })
 };
 
+exports.SendShareMe = (recipientId) => {
+  const messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      attachment: {
+        type: "template",
+        payload:{
+          template_type:"generic",
+          elements:[{
+            title:"Share Memebot!",
+            subtitle:"( ͡° ͜ʖ ͡°) Your friends need to see me",
+            image_url:"https://i.imgur.com/KWl6pqT.jpg",
+            item_url: "https://www.facebook.com/1memebot/",
+            buttons:[{
+              type:"element_share"
+            }]
+          }]
+        }
+      }
+    }
+  };
+  
+  return new Promise((resolve, reject) => {
+    hlpr.log(`--Sending ShareMe!!`);
+    callSendAPI(messageData)
+    .then(() => {
+      resolve();
+    })
+    .catch(() => {
+      reject();
+    })
+  })
+};
+
 exports.SendText = (recipientId, messageText) => {
   if(messageText == null || messageText == "")
     messageText = "";
@@ -118,8 +154,13 @@ function GetQuickReplies() {
       "title":"wild",
       "payload":"   ",
       "image_url":"http://i.imgur.com/M1k4gZi.png"
-    }    
-
+    },
+    {
+      "content_type":"text",
+      "title":"share",
+      "payload":"   ",
+      "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
+    }
   ]
 }
 
