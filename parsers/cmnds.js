@@ -19,7 +19,7 @@ exports.IsTextRequest = (input) => {
     default:
       return false;
   }
-}
+};
 
 exports.IsShareRequest = (input) => {
   if(input == undefined)
@@ -33,31 +33,31 @@ exports.IsShareRequest = (input) => {
       hlpr.log("Command is probably image request");
       return false;
   }
-}
+};
 
 /**
  * @return {string}
  * @return {string}
  */
 exports.ParseCommand = (input) => {
-  var commandAliases = {
-    "meme" : ["meme","normal",":)", "👍", "", null, undefined],
-    "hot" : ["hot"],
-    "dank" : ["dank"],
-    "random" : ["random","mild"],
-    "xxx" : ["xxx","wild"],
-    "why" : ["why"], 
-    "how" : ["how"], 
-    "welcome" : ["welcome"], 
-    "help" : ["help"],
-    "share" : ["share"],
-  }  
+  const commandAliases = {
+    "meme": ["meme", "normal", ":)", "👍", "", null, undefined],
+    "hot": ["hot"],
+    "dank": ["dank"],
+    "random": ["random", "mild"],
+    "xxx": ["xxx", "wild"],
+    "why": ["why"],
+    "how": ["how"],
+    "welcome": ["welcome"],
+    "help": ["help"],
+    "share": ["share"],
+  };
   if(input == undefined)
     input = "";
   let inputLower = input.toLowerCase();
-  for(var command in commandAliases) {
-    var aliases = commandAliases[command];
-    for(var alias of aliases) {
+  for(let command in commandAliases) {
+    const aliases = commandAliases[command];
+    for(let alias of aliases) {
       if(alias == inputLower) {
         hlpr.log("Command parsed: " + command);
         return command;
@@ -65,4 +65,4 @@ exports.ParseCommand = (input) => {
     }
   }
   return "meme";
-}
+};

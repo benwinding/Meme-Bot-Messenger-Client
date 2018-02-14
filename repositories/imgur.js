@@ -2,7 +2,7 @@ const rp = require('request-promise-native');
 
 const hlpr = require('../helpers');
 
-exports.GetRandomImage = function () {
+exports.GetRandomImage = () => {
   const url = 'https://api.imgur.com/3/gallery/random/random/1/';
   return new Promise((resolve, reject) => {
     rp({
@@ -21,8 +21,7 @@ exports.GetRandomImage = function () {
   }) 
 };
 
-exports.GetMemeImage = function (timePeriod, pageLast, itemsLast)
-{
+exports.GetMemeImage = (timePeriod, pageLast, itemsLast) => {
   const imgurPrefix = 'https://api.imgur.com/3/gallery/t/dump/top/';
   const url = imgurPrefix + timePeriod + '/' + hlpr.getRandomNumberEven(0, pageLast);
   return new Promise((resolve, reject) => {

@@ -22,7 +22,7 @@ exports.GetImageFromCommand = (command) => {
         reject();
     }
   })
-}
+};
 
 exports.GetTextFromCommand = (input) => {
   let inputLower = input;
@@ -42,5 +42,5 @@ exports.GetTextFromCommand = (input) => {
     }
     reject();
   })
-}
+};
 

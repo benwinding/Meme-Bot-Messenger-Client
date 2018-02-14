@@ -5,7 +5,7 @@ const cmds = require('./parsers/cmnds');
 
 exports.GetHot = (imgursubreddit) => {
   return new Promise((resolve, reject) => {
-    var choice = hlpr.getRandomNumberBiased(1, 11);
+    const choice = hlpr.getRandomNumberBiased(1, 11);
     switch (choice) {
       case 1:
       case 2:
@@ -23,11 +23,11 @@ exports.GetHot = (imgursubreddit) => {
     }
     reject();
   });
-}
+};
 
 exports.GetImgurSubreddit = (imgursubreddit) => {
   return new Promise((resolve, reject) => {
-    var choice = hlpr.getRandomNumberBiased(1, 11);
+    const choice = hlpr.getRandomNumberBiased(1, 11);
     switch (choice) {
       case 1:
       case 2:
@@ -47,11 +47,11 @@ exports.GetImgurSubreddit = (imgursubreddit) => {
     }
     reject();
   });
-}
+};
 
 exports.getWild = () => {
   return new Promise((resolve, reject) => {
-    var choice = hlpr.getRandomNumberBiased(1, 12);
+    const choice = hlpr.getRandomNumberBiased(1, 12);
     switch(choice) {
       case 1: 
       case 2: 
@@ -70,11 +70,11 @@ exports.getWild = () => {
     }
     reject();
   })
-}
+};
 
 exports.GetMeme = () => {
   return new Promise((resolve, reject) => {
-    var choice = hlpr.getRandomNumberBiased(1, 12);
+    const choice = hlpr.getRandomNumberBiased(1, 12);
     switch(choice) {
       case 1: 
       case 2: 
@@ -96,4 +96,4 @@ exports.GetMeme = () => {
     }
     reject();
   })
-}
+};
