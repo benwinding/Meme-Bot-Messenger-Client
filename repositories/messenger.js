@@ -157,6 +157,12 @@ function GetQuickReplies() {
     },
     {
       "content_type":"text",
+      "title":"MemEcon",
+      "payload":"   ",
+      "image_url":"http://i.imgur.com/hNVgPhM.png"
+    },
+    {
+      "content_type":"text",
       "title":"share",
       "payload":"   ",
       "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"

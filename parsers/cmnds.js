@@ -51,6 +51,7 @@ exports.ParseCommand = (input) => {
     "welcome": ["welcome"],
     "help": ["help"],
     "share": ["share"],
+    "memecon": ["memecon", "MemEcon", "MemeEconomy"],
   };
   if(input == undefined)
     input = "";
