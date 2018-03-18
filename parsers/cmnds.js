@@ -53,7 +53,7 @@ exports.ParseCommand = (input) => {
     "share": ["share"],
     "memecon": ["memecon", "MemEcon", "MemeEconomy"],
   };
-  if(input == undefined)
+  if(!input)
     input = "";
   let inputLower = input.toLowerCase();
   for(let command in commandAliases) {
