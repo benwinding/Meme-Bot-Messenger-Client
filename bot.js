@@ -46,54 +46,53 @@ app.get('/', function(req, res) {
 // Message processing
 app.post('/webhook', function (req, res) {
   const data = req.body;
-  hlpr.log("Data: " + data);
-  if (data.object === 'page') {
-    data.entry.forEach(function(entry) {
-      let pageID = entry.id;
-      let timeOfEvent = entry.time;
-      entry.messaging.forEach(function(event) {
-        if (event.message) {
-          receivedMessage(event);
-        } else {
-          console.log("Webhook received unknown event: ", event);
-        }
-      });
-    });
+  if (data.object !== 'page') {
+    console.log("Webhook unknown event not a page", event);
+    res.sendStatus(501);
+    return;
   }
+  if (!data.entry) {
+    console.log("Webhook unknown event no messages in request", event);
+    res.sendStatus(500);
+    return;
+  }
+  data.entry.forEach(function(entry) {
+    if (!entry.messaging)
+      return;
+    entry.messaging.forEach(function(event) {
+      const senderId = event.sender.id;
+      const message = event.message;
+      const postback = event.postback;
+      if (message)
+        handleMessageRecieved(senderId, message);
+      else if(postback)
+        handleMessageRecieved(senderId, postback);
+      else
+        console.log("Webhook unknown event not a message or postback: ", event);
+    });
+  });
   res.sendStatus(200);
 });
 
-// Incoming events handling
-function receivedMessage(event) {
-  const senderID = event.sender.id;
-  let recipientID = event.recipient.id;
-  let timeOfMessage = event.timestamp;
-  const message = event.message;
-
-  hlpr.log(`Received message from user ${senderID}, with message: ${message.text}`);
-
-  let messageId = message.mid;
-  const messageText = message.text;
-  let messageAttachments = message.attachments;
-  
+function handleMessageRecieved(senderID, messageText) {
   const commandParsed = prsr.ParseCommand(messageText);
-  
+
   if(prsr.IsTextRequest(commandParsed)) {
     dpar.GetTextFromCommand(commandParsed)
-    .then((textMessage) => messenger.SendText(senderID, textMessage))    
-    .then(() => IncrementCounter(commandParsed));
+      .then((textMessage) => messenger.SendText(senderID, textMessage))
+      .then(() => IncrementCounter(commandParsed));
     return;
   }
   if(prsr.IsShareRequest(commandParsed)) {
-    messenger.SendShareMe(senderID)   
-    .then(() => IncrementCounter(commandParsed));
+    messenger.SendShareMe(senderID)
+      .then(() => IncrementCounter(commandParsed));
     return;
   }
   // Try send three times
   TrySendMeme(senderID, commandParsed)
-  .catch(() => TrySendMeme(senderID, commandParsed))
-  .catch(() => TrySendMeme(senderID, commandParsed))
-  .catch(() => SendSafeMeme(senderID));
+    .catch(() => TrySendMeme(senderID, commandParsed))
+    .catch(() => TrySendMeme(senderID, commandParsed))
+    .catch(() => SendSafeMeme(senderID));
 }
 
 function TrySendMeme(senderID, commandRecieved){
