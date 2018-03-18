@@ -10,6 +10,7 @@ const prsr = require('./parsers/cmnds');
 const urls = require('./parsers/path-parser');
 const dpar = require('./parsers/dparsers');
 const messenger = require('./repositories/messenger');
+const path = require('path');
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -20,7 +21,6 @@ app.use(bodyParser.urlencoded({
 }));
 // 522466234751069
 // 521529374844755
-
 
 
 // Webhook validation
@@ -35,11 +35,10 @@ app.get('/webhook', function(req, res) {
   }
 });
 
+app.use(express.static('public'));
 // Display the web page
 app.get('/', function(req, res) {
-  const messengerButton = "<html><head><title>Facebook Messenger Bot</title></head><body><h1>Facebook Messenger Bot</h1>This is a bot based on Messenger Platform QuickStart. For more details, see their <a href=\"https://developers.facebook.com/docs/messenger-platform/guides/quick-start\">docs</a>.<footer id=\"gWidget\"></footer><script src=\"https://widget.glitch.me/widget.min.js\"></script></body></html>";
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.write(messengerButton);
+  res.send('index.html');
   res.end();
 });
 
