@@ -11,7 +11,7 @@ exports.GetImageFromCommand = (command) => {
       case "meme":
         resolve(meme.GetMeme());break;
       case "dank":
-        resolve(reddit.GetRedditSubReddit("dankmemes", "Feb 21 2016", 10));break;
+        resolve(meme.GetImgurSubreddit("dankmemes"));break;
       case "hot":
         resolve(meme.GetHot());break;
       case "xxx":
