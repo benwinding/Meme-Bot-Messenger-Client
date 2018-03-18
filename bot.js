@@ -65,7 +65,7 @@ app.post('/webhook', function (req, res) {
       if (message)
         handleMessageRecieved(senderId, message);
       else if(postback)
-        handleMessageRecieved(senderId, postback);
+        handlePostBackRecieved(senderId, postback);
       else
         console.log("Webhook unknown event not a message or postback: ", event);
     });
@@ -73,7 +73,23 @@ app.post('/webhook', function (req, res) {
   res.sendStatus(200);
 });
 
-function handleMessageRecieved(senderID, messageText) {
+function handleMessageRecieved(senderId, message) {
+  if(message.quick_reply)
+    parseAndSend(senderId, message.quick_reply.payload);
+  else if(message.text)
+    parseAndSend(senderId, message.text);
+  else
+    parseAndSend(senderId, "meme");
+}
+
+function handlePostBackRecieved(senderId, postback) {
+  if(postback.payload === 'GET_STORY_MENU')
+    parseAndSend(senderId, "meme");
+  else
+    parseAndSend(senderId, postback.payload);
+}
+
+function parseAndSend(senderID, messageText) {
   const commandParsed = prsr.ParseCommand(messageText);
 
   if(prsr.IsTextRequest(commandParsed)) {
@@ -82,7 +98,7 @@ function handleMessageRecieved(senderID, messageText) {
       .then(() => IncrementCounter(commandParsed));
     return;
   }
-  if(prsr.IsShareRequest(commandParsed)) {
+  else if(prsr.IsShareRequest(commandParsed)) {
     messenger.SendShareMe(senderID)
       .then(() => IncrementCounter(commandParsed));
     return;
