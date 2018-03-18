@@ -19,7 +19,7 @@ exports.GetImageFromCommand = (command) => {
       case "random":
         resolve(meme.GetImgurSubreddit("mildlyinteresting"));break;
       case "memecon":
-        resolve(reddit.GetRedditSubReddit("MemeEconomy", "Feb 21 2017", 10));break;
+        resolve(meme.GetImgurSubreddit("MemeEconomy"));break;
       default:
         reject();
     }
