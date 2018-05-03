@@ -39,8 +39,8 @@ exports.SendShareMe = (recipientId) => {
         payload:{
           template_type:"generic",
           elements:[{
-            title:"Share Memebot!",
-            subtitle:"( ͡° ͜ʖ ͡°) Your friends need to see me",
+            title:"Click here ↑ to talk to Meme Bot",
+            subtitle:"... Or click here ↓ to send Meme Bot to your friends",
             image_url:"https://i.imgur.com/RJSjTF6.jpg",
             item_url: "https://m.me/1memebot",
             buttons:[{
