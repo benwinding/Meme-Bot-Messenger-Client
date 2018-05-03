@@ -163,8 +163,8 @@ function GetQuickReplies() {
     },
     {
       "content_type":"text",
-      "title":"share",
-      "payload":"SHARE",
+      "title":"share me",
+      "payload":"SHARE ME",
       "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
     }
   ]
