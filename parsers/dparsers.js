@@ -37,6 +37,8 @@ exports.GetTextFromCommand = (input) => {
         resolve(msgs.GetWelcome());break;
       case "help":
         resolve(msgs.GetHelp());break;
+      case "share me":
+        resolve(msgs.GetShareMe());break;
       default:
         resolve(msgs.GetWelcome());
     }

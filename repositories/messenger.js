@@ -157,7 +157,7 @@ function GetQuickReplies() {
     },
     {
       "content_type":"text",
-      "title":"share",
+      "title":"Share Me",
       "payload":"   ",
       "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
     }

@@ -46,3 +46,9 @@ Try my buttons below!
   `;
   return Promise.resolve(welcomeMsg);
 };
+
+exports.GetShareMe = () => {
+  const text = `Share me to your friends! ^
+https://m.me/1memebot`;
+  return Promise.resolve(welcomeMsg);
+};
