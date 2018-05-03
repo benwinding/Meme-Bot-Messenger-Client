@@ -98,12 +98,12 @@ function parseAndSend(senderID, messageText) {
       .then(() => IncrementCounter(commandParsed));
     return;
   }
-  // else if(prsr.IsShareRequest(commandParsed)) {
-  //   messenger.SendShareMe(senderID)
-  //     .then(() => IncrementCounter(commandParsed));
-  //   return;
-  // }
-  // Try send three times
+  else if(prsr.IsShareRequest(commandParsed)) {
+    messenger.SendShareMe(senderID)
+      .then(() => IncrementCounter(commandParsed));
+    return;
+  }
+  Try send three times
   TrySendMeme(senderID, commandParsed)
     .catch(() => TrySendMeme(senderID, commandParsed))
     .catch(() => TrySendMeme(senderID, commandParsed))

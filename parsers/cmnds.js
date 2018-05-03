@@ -14,7 +14,6 @@ exports.IsTextRequest = (input) => {
     case "how":
     case "welcome":
     case "help":
-    case "share":
       hlpr.log("Command is text request");
       return true;
     default:

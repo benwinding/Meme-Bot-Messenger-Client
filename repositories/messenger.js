@@ -42,7 +42,7 @@ exports.SendShareMe = (recipientId) => {
             title:"Share Memebot!",
             subtitle:"( ͡° ͜ʖ ͡°) Your friends need to see me",
             image_url:"https://i.imgur.com/KWl6pqT.jpg",
-            item_url: "https://www.facebook.com/1memebot/",
+            item_url: "https://m.me/1memebot",
             buttons:[{
               type:"element_share"
             }]
