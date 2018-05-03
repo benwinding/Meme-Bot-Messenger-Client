@@ -10,6 +10,7 @@ const prsr = require('./parsers/cmnds');
 const urls = require('./parsers/path-parser');
 const dpar = require('./parsers/dparsers');
 const messenger = require('./repositories/messenger');
+const path = require('path');
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -20,7 +21,6 @@ app.use(bodyParser.urlencoded({
 }));
 // 522466234751069
 // 521529374844755
-
 
 
 // Webhook validation
@@ -35,65 +35,79 @@ app.get('/webhook', function(req, res) {
   }
 });
 
+app.use(express.static('public'));
 // Display the web page
 app.get('/', function(req, res) {
-  const messengerButton = "<html><head><title>Facebook Messenger Bot</title></head><body><h1>Facebook Messenger Bot</h1>This is a bot based on Messenger Platform QuickStart. For more details, see their <a href=\"https://developers.facebook.com/docs/messenger-platform/guides/quick-start\">docs</a>.<footer id=\"gWidget\"></footer><script src=\"https://widget.glitch.me/widget.min.js\"></script></body></html>";
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  res.write(messengerButton);
+  res.send('index.html');
   res.end();
 });
 
 // Message processing
 app.post('/webhook', function (req, res) {
   const data = req.body;
-  hlpr.log("Data: " + data);
-  if (data.object === 'page') {
-    data.entry.forEach(function(entry) {
-      let pageID = entry.id;
-      let timeOfEvent = entry.time;
-      entry.messaging.forEach(function(event) {
-        if (event.message) {
-          receivedMessage(event);
-        } else {
-          console.log("Webhook received unknown event: ", event);
-        }
-      });
-    });
+  if (data.object !== 'page') {
+    console.log("Webhook unknown event not a page", event);
+    res.sendStatus(501);
+    return;
   }
+  if (!data.entry) {
+    console.log("Webhook unknown event no messages in request", event);
+    res.sendStatus(500);
+    return;
+  }
+  data.entry.forEach(function(entry) {
+    if (!entry.messaging)
+      return;
+    entry.messaging.forEach(function(event) {
+      const senderId = event.sender.id;
+      const message = event.message;
+      const postback = event.postback;
+      if (message)
+        handleMessageRecieved(senderId, message);
+      else if(postback)
+        handlePostBackRecieved(senderId, postback);
+      else
+        console.log("Webhook unknown event not a message or postback: ", event);
+    });
+  });
   res.sendStatus(200);
 });
 
-// Incoming events handling
-function receivedMessage(event) {
-  const senderID = event.sender.id;
-  let recipientID = event.recipient.id;
-  let timeOfMessage = event.timestamp;
-  const message = event.message;
+function handleMessageRecieved(senderId, message) {
+  if(message.quick_reply)
+    parseAndSend(senderId, message.quick_reply.payload);
+  else if(message.text)
+    parseAndSend(senderId, message.text);
+  else
+    parseAndSend(senderId, "meme");
+}
 
-  hlpr.log(`Received message from user ${senderID}, with message: ${message.text}`);
+function handlePostBackRecieved(senderId, postback) {
+  if(postback.payload === 'GET_STORY_MENU')
+    parseAndSend(senderId, "meme");
+  else
+    parseAndSend(senderId, postback.payload);
+}
 
-  let messageId = message.mid;
-  const messageText = message.text;
-  let messageAttachments = message.attachments;
-  
+function parseAndSend(senderID, messageText) {
   const commandParsed = prsr.ParseCommand(messageText);
-  
+
   if(prsr.IsTextRequest(commandParsed)) {
     dpar.GetTextFromCommand(commandParsed)
-    .then((textMessage) => messenger.SendText(senderID, textMessage))    
-    .then(() => IncrementCounter(commandParsed));
+      .then((textMessage) => messenger.SendText(senderID, textMessage))
+      .then(() => IncrementCounter(commandParsed));
     return;
   }
-  if(prsr.IsShareRequest(commandParsed)) {
-    messenger.SendShareMe(senderID)   
-    .then(() => IncrementCounter(commandParsed));
+  else if(prsr.IsShareRequest(commandParsed)) {
+    messenger.SendShareMe(senderID)
+      .then(() => IncrementCounter(commandParsed));
     return;
   }
   // Try send three times
   TrySendMeme(senderID, commandParsed)
-  .catch(() => TrySendMeme(senderID, commandParsed))
-  .catch(() => TrySendMeme(senderID, commandParsed))
-  .catch(() => SendSafeMeme(senderID));
+    .catch(() => TrySendMeme(senderID, commandParsed))
+    .catch(() => TrySendMeme(senderID, commandParsed))
+    .catch(() => SendSafeMeme(senderID));
 }
 
 function TrySendMeme(senderID, commandRecieved){

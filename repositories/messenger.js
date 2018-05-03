@@ -122,43 +122,49 @@ function GetQuickReplies() {
     {
       "content_type":"text",
       "title":":)",
-      "payload":"   ",
+      "payload":"MEME",
       "image_url":"http://i.imgur.com/vTstaG7.png"
     },
     {
       "content_type":"text",
       "title":"Hot",
-      "payload":"   ",
+      "payload":"HOT",
       "image_url":"http://i.imgur.com/5jtndzY.png"
     },
     {
       "content_type":"text",
       "title":"Dank",
-      "payload":"   ",
+      "payload":"DANK",
       "image_url":"http://i.imgur.com/nE9A8zX.png"
     },    
     {
       "content_type":"text",
       "title":"Help",
-      "payload":"   ",
+      "payload":"HELP",
       "image_url":"http://i.imgur.com/mV7Diob.png"
     },
     {
       "content_type":"text",
       "title":"mild",
-      "payload":"   ",
+      "payload":"MILD",
       "image_url":"http://i.imgur.com/HrdBnhZ.png"
     },
     {
       "content_type":"text",
       "title":"wild",
-      "payload":"   ",
+      "payload":"WILD",
       "image_url":"http://i.imgur.com/M1k4gZi.png"
     },
     {
       "content_type":"text",
-      "title":"Share Me",
-      "payload":"   ",
+      "title":"MemEcon",
+      "payload":"MEMECON",
+      "image_url":"http://i.imgur.com/hNVgPhM.png"
+    },
+    {
+      "content_type":"text",
+      "title":"share",
+      "payload":"SHARE",
       "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
     }
   ]
