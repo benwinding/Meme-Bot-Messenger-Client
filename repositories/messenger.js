@@ -39,10 +39,10 @@ exports.SendShareMe = (recipientId) => {
         payload:{
           template_type:"generic",
           elements:[{
-            title:"Share Memebot!",
-            subtitle:"( ͡° ͜ʖ ͡°) Your friends need to see me",
-            image_url:"https://i.imgur.com/KWl6pqT.jpg",
-            item_url: "https://www.facebook.com/1memebot/",
+            title:"↑↑ Click to talk to Meme Bot!",
+            subtitle:"↓↓ Send Meme Bot to your friends!",
+            image_url:"https://i.imgur.com/RJSjTF6.jpg",
+            item_url: "https://m.me/1memebot",
             buttons:[{
               type:"element_share"
             }]
@@ -163,8 +163,8 @@ function GetQuickReplies() {
     },
     {
       "content_type":"text",
-      "title":"share",
-      "payload":"SHARE",
+      "title":"share me",
+      "payload":"SHARE ME",
       "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
     }
   ]

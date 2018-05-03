@@ -50,5 +50,5 @@ Try my buttons below!
 exports.GetShareMe = () => {
   const text = `Share me to your friends! ^
 https://m.me/1memebot`;
-  return Promise.resolve(welcomeMsg);
+  return Promise.resolve(text);
 };

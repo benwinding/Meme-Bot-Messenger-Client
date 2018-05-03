@@ -50,7 +50,7 @@ exports.ParseCommand = (input) => {
     "how": ["how"],
     "welcome": ["welcome"],
     "help": ["help"],
-    "share": ["share"],
+    "share": ["share", "share me"],
     "memecon": ["memecon", "MemEcon", "MemeEconomy"],
   };
   if(!input)
