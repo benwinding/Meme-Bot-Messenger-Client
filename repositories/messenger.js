@@ -44,7 +44,6 @@ exports.SendShareMe = (recipientId) => {
             image_url:"https://i.imgur.com/RJSjTF6.jpg",
             item_url: "https://m.me/1memebot",
             buttons:[{
-              title:"Send to friends!",
               type:"element_share"
             }]
           }]
