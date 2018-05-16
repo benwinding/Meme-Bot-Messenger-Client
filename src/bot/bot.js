@@ -64,6 +64,9 @@ function parseAndSend(senderId, command) {
         case "help":
             sendText(senderId, msgs.GetHelp());
             break;
+        case "donate":
+            sendText(senderId, msgs.GetHelp());
+            break;
         case "welcome":
             sendText(senderId, msgs.GetWelcome());
             break;

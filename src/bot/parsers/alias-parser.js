@@ -33,6 +33,7 @@ exports.IsShareRequest = (input) => {
 const commandAliases = {
     "meme": ["meme", "normal", ":)", "👍", "", null, undefined],
     "hot": ["hot"],
+    "pay me": ["pay me", "help me"],
     "dank": ["dank"],
     "random": ["random", "mild"],
     "xxx": ["xxx", "wild"],
