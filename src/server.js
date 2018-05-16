@@ -17,7 +17,6 @@ app.use(bodyParser.urlencoded({
 // 522466234751069
 // 521529374844755
 
-
 // Webhook validation
 app.get('/webhook', function(req, res) {
   if (req.query['hub.mode'] === 'subscribe' &&

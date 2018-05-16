@@ -1,9 +1,5 @@
 const hlpr = require('../../shared/helpers');
 
-/**
- * @return {boolean}
- * @return {boolean}
- */
 exports.IsTextRequest = (input) => {
   if(input == undefined)
     input = "";
@@ -34,12 +30,7 @@ exports.IsShareRequest = (input) => {
   }
 };
 
-/**
- * @return {string}
- * @return {string}
- */
-exports.ParseCommand = (input) => {
-  const commandAliases = {
+const commandAliases = {
     "meme": ["meme", "normal", ":)", "👍", "", null, undefined],
     "hot": ["hot"],
     "dank": ["dank"],
@@ -51,16 +42,17 @@ exports.ParseCommand = (input) => {
     "help": ["help"],
     "share": ["share", "share me"],
     "memecon": ["memecon", "MemEcon", "MemeEconomy"],
-  };
+};
+exports.ParseCommand = (input) => {
   if(!input)
     input = "";
   let parsedCommand = "meme";
   let inputLower = input.toLowerCase();
-  for(let command in commandAliases) {
-    const aliases = commandAliases[command];
+  for(let currentCommand in commandAliases) {
+    const aliases = commandAliases[currentCommand];
     for(let alias of aliases) {
       if(alias == inputLower) {
-        parsedCommand = alias;
+        parsedCommand = currentCommand;
       }
     }
   }
