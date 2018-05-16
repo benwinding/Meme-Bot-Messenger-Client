@@ -56,8 +56,10 @@ app.post('/webhook', function (req, res) {
     return;
   }
   data.entry.forEach(function(entry) {
-    if (!entry.messaging)
+    if (!entry.messaging) {
+      console.log("Webhook received message, but not not a message", event);
       return;
+    }
     entry.messaging.forEach(function(event) {
       const senderId = event.sender.id;
       const message = event.message;

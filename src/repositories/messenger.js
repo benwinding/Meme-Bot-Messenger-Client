@@ -183,8 +183,8 @@ function callSendAPI(messageData) {
       hlpr.log(`Successfully sent message to recipient ${recipientId}`); 
       resolve();
     })
-    .catch(() => {
-      hlpr.log(`Message failed to send to id: ${recipientId}`); 
+    .catch((err) => {
+      hlpr.log(`Message failed to send to id: ${recipientId}`);
       reject();
     });
   }) 
