@@ -1,5 +1,4 @@
-const hlpr = require('../helpers');
-const path = require('path');
+const hlpr = require('../../shared/helpers');
 
 /**
  * @return {boolean}
@@ -55,15 +54,16 @@ exports.ParseCommand = (input) => {
   };
   if(!input)
     input = "";
+  let parsedCommand = "meme";
   let inputLower = input.toLowerCase();
   for(let command in commandAliases) {
     const aliases = commandAliases[command];
     for(let alias of aliases) {
       if(alias == inputLower) {
-        hlpr.log("Command parsed: " + command);
-        return command;
+        parsedCommand = alias;
       }
     }
   }
-  return "meme";
+  hlpr.log(`--Input: '${input}' parsed to command: '${parsedCommand}'`);
+  return parsedCommand;
 };

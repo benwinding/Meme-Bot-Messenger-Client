@@ -1,7 +1,5 @@
 const imgur = require('./repositories/imgur');
-const reddit = require('./repositories/reddit');
-const hlpr = require('./helpers');
-const cmds = require('./parsers/cmnds');
+const hlpr = require('../shared/helpers');
 
 exports.GetHot = (imgursubreddit) => {
   return new Promise((resolve, reject) => {
@@ -47,29 +45,6 @@ exports.GetImgurSubreddit = (imgursubreddit) => {
     }
     reject();
   });
-};
-
-exports.getWild = () => {
-  return new Promise((resolve, reject) => {
-    const choice = hlpr.getRandomNumberBiased(1, 12);
-    switch(choice) {
-      case 1: 
-      case 2: 
-        resolve(reddit.GetRedditSubRedditRange("SFWPornGifs", "Sep 17 2014", 30, "Feb 17 2016"));break;
-      case 3: 
-      case 4: 
-      case 5: 
-      case 6: 
-      case 7: 
-      case 8: 
-      case 9: 
-      case 10: 
-      case 11: 
-      default: 
-        resolve(reddit.GetRedditSubReddit("gonecivil", "Sep 17 2013", 10));break;
-    }
-    reject();
-  })
 };
 
 exports.GetMeme = () => {

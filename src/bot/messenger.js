@@ -1,4 +1,4 @@
-const hlpr = require('../helpers');
+const hlpr = require('../shared/helpers');
 const rp = require('request-promise-native');
 
 exports.SendImage = (recipientId, imageUrl) => {
@@ -23,6 +23,7 @@ exports.SendImage = (recipientId, imageUrl) => {
       resolve();
     })
     .catch(() => {
+      hlpr.err(`--Error sending image to messenger API`);
       reject();
     })
   })
@@ -59,6 +60,7 @@ exports.SendShareMe = (recipientId) => {
       resolve();
     })
     .catch(() => {
+      hlpr.err(`--Error sending share to messenger API`);
       reject();
     })
   })
@@ -83,6 +85,7 @@ exports.SendText = (recipientId, messageText) => {
       resolve();
     })
     .catch(() => {
+      hlpr.err(`--Error sending text to messenger API`);
       reject();
     })
   })
@@ -110,6 +113,7 @@ exports.SendVideo = (recipientId, imageUrl) => {
       resolve();
     })
     .catch(() => {
+      hlpr.err(`--Error sending video to messenger API`);
       reject();
     })
   })
@@ -184,7 +188,7 @@ function callSendAPI(messageData) {
       resolve();
     })
     .catch((err) => {
-      hlpr.log(`Message failed to send to id: ${recipientId}`);
+      hlpr.err(`Message failed to send to id: ${recipientId}`, err);
       reject();
     });
   }) 

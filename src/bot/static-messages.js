@@ -1,4 +1,4 @@
-const hlpr = require('../helpers');
+const hlpr = require('../shared/helpers');
 
 //////////////////////////
 // Send Descriptions
