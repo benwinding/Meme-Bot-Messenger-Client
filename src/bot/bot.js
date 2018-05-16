@@ -59,13 +59,13 @@ function parseAndSend(senderId, command) {
             sendText(senderId, msgs.GetHow());
             break;
         case "share":
-            sendShare(senderId);
+            messenger.SendShareMe(senderId);
             break;
         case "help":
             sendText(senderId, msgs.GetHelp());
             break;
         case "donate":
-            sendText(senderId, msgs.GetHelp());
+            messenger.SendPayMe(senderId);
             break;
         case "welcome":
             sendText(senderId, msgs.GetWelcome());
@@ -96,10 +96,6 @@ function sendText(senderId, memePromise) {
     .catch((err) => {
         hlpr.err('Error Bot.SendText: ', err);
     });
-}
-
-function sendShare(senderId) {
-    messenger.SendShareMe(senderId)
 }
 
 function incrementCommandCounter(label) {

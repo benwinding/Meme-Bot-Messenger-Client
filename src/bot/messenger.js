@@ -74,18 +74,24 @@ function sendPayMe(recipientId) {
             id: recipientId
         },
         message: {
-            attachment: {
-                type: "template",
-                payload:{
-                    template_type:"generic",
-                    elements:[{
-                        title:"↓↓ Want to help?!",
-                        image_url:"https://i.imgur.com/Y6dpSAW.jpg",
-                        item_url: "https://payments-memebot.herokuapp.com/",
-                        buttons:[{
-                            type:"element_share"
-                        }]
-                    }]
+            "attachment":{
+                "type":"template",
+                "payload":{
+                    "template_type":"open_graph",
+                    "elements":[
+                        {
+                            "url":"https://payments-memebot.herokuapp.com/",
+                            "buttons":[
+                                {
+                                    "type":"web_url",
+                                    "url":"https://payments-memebot.herokuapp.com/",
+                                    "title":"See how!",
+                                    "webview_height_ratio": "tall",
+                                    "messenger_extensions": true
+                                }
+                            ]
+                        }
+                    ]
                 }
             },
             quick_replies: msgs.GetQuickReplies()

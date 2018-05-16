@@ -96,13 +96,13 @@ function GetQuickReplies() {
             "content_type":"text",
             "title":"share me",
             "payload":"SHARE ME",
-            "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
+            "image_url":"https://i.imgur.com/rs0VIuC.png"
         },
         {
             "content_type":"text",
-            "title":"help me",
+            "title":"donate",
             "payload":"PAY ME",
-            "image_url":"https://cdn3.iconfinder.com/data/icons/glypho-free/64/share-128.png"
+            "image_url":"https://i.imgur.com/SGEnvkE.jpg"
         }
     ]
 }
