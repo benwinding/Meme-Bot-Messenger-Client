@@ -53,7 +53,8 @@ function sendShareMe(recipientId) {
                   }
                 ]
               }
-            }
+            },
+            quick_replies: msgs.GetQuickReplies()
         }
     };
 
@@ -75,35 +76,30 @@ function sendPayMe(recipientId) {
         recipient: {
             id: recipientId
         },
-        message: {
-            "attachment":{
-                "type":"template",
-                "payload":{
-                    "template_type":"generic",
-                    "elements":[
-                        {
-                            "url":"https://messenger-bot-test1.glitch.me/webview.html",
-                            "buttons":[
-                                {
-                                    "type":"web_url",
-                                    "url":"https://messenger-bot-test1.glitch.me/webview.html",
-                                    "title":"See how!",
-                                    "webview_height_ratio": "compact",
-                                    "messenger_extensions": "true" 
-                                },{
-                                    "type":"web_url",
-                                    "url":"https://www.example.com",
-                                    "title":"See how!",
-                                    "webview_height_ratio":"compact",
-                                    "messenger_extensions": "true" 
-                                },
-                            ]
-                        }
-                    ]
+        "message":{
+          "attachment":{
+            "type":"template",
+            "payload":{
+              "template_type":"generic",
+              "elements":[
+                 {
+                  "title": "Donations Help",
+                  "image_url":"https://i.imgur.com/drYGEoT.gif",
+                  "buttons":[
+                    {
+                      "type":"web_url",
+                      "url":"https://messenger-bot-test1.glitch.me/webview.html",
+                      "title":"Donate Now"
+                    }              
+                  ]      
                 }
-            },
+              ]
+            }
+          },
+          quick_replies: msgs.GetQuickReplies()
         }
-    };
+
+    }
 
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending PayMe!!`);
