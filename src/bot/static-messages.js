@@ -70,6 +70,12 @@ function GetQuickReplies() {
         },
         {
             "content_type":"text",
+            "title":"donate",
+            "payload":"PAY ME",
+            "image_url":"https://i.imgur.com/SGEnvkE.jpg"
+        },
+        {
+            "content_type":"text",
             "title":"Help",
             "payload":"HELP",
             "image_url":"http://i.imgur.com/mV7Diob.png"
@@ -98,12 +104,6 @@ function GetQuickReplies() {
             "payload":"SHARE ME",
             "image_url":"https://i.imgur.com/rs0VIuC.png"
         },
-        {
-            "content_type":"text",
-            "title":"donate",
-            "payload":"PAY ME",
-            "image_url":"https://i.imgur.com/SGEnvkE.jpg"
-        }
     ]
 }
 

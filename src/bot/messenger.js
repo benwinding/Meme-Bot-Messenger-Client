@@ -36,22 +36,24 @@ function sendShareMe(recipientId) {
             id: recipientId
         },
         message: {
-            attachment: {
-                type: "template",
-                payload:{
-                    template_type:"generic",
-                    elements:[{
-                        title:"↑↑ Click to talk to Meme Bot!",
-                        subtitle:"↓↓ Send Meme Bot to your friends!",
-                        image_url:"https://i.imgur.com/RJSjTF6.jpg",
-                        item_url: "https://m.me/1memebot",
-                        buttons:[{
-                            type:"element_share"
-                        }]
-                    }]
-                }
-            },
-            quick_replies: msgs.GetQuickReplies()
+             "attachment":{
+              "type":"template",
+              "payload":{
+                "template_type":"open_graph",
+                "elements":[
+                   {
+                    "url":"https://www.example.com",
+                    "buttons":[
+                      {
+                        "type":"web_url",
+                        "url":"https://www.example.com",
+                        "title":"View More"
+                      }              
+                    ]      
+                  }
+                ]
+              }
+            }
         }
     };
 
@@ -77,24 +79,29 @@ function sendPayMe(recipientId) {
             "attachment":{
                 "type":"template",
                 "payload":{
-                    "template_type":"open_graph",
+                    "template_type":"generic",
                     "elements":[
                         {
-                            "url":"https://payments-memebot.herokuapp.com/",
+                            "url":"https://messenger-bot-test1.glitch.me/webview.html",
                             "buttons":[
                                 {
                                     "type":"web_url",
-                                    "url":"https://payments-memebot.herokuapp.com/",
+                                    "url":"https://messenger-bot-test1.glitch.me/webview.html",
                                     "title":"See how!",
-                                    "webview_height_ratio": "tall",
-                                    "messenger_extensions": true
-                                }
+                                    "webview_height_ratio": "compact",
+                                    "messenger_extensions": "true" 
+                                },{
+                                    "type":"web_url",
+                                    "url":"https://www.example.com",
+                                    "title":"See how!",
+                                    "webview_height_ratio":"compact",
+                                    "messenger_extensions": "true" 
+                                },
                             ]
                         }
                     ]
                 }
             },
-            quick_replies: msgs.GetQuickReplies()
         }
     };
 

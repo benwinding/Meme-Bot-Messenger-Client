@@ -3,6 +3,7 @@
 //
 'use strict';
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const hlpr = require('./shared/helpers');
 const Bot = require('./bot/bot');
@@ -29,12 +30,18 @@ app.get('/webhook', function(req, res) {
   }
 });
 
-app.use(express.static('public'));
-// Display the web page
-app.get('/', function(req, res) {
-  res.send('index.html');
-  res.end();
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('X-Frame-Options', 'ALLOW-FROM https://messenger.com');
+    res.append('X-Frame-Options', 'ALLOW-FROM https://facebook.com');
+    res.append('X-Frame-Options', 'ALLOW-FROM https://fb.com');
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
 });
+
+// Statically serve files
+app.use(express.static('src/public'));
 
 // Message processing
 app.post('/webhook', function (req, res) {
@@ -68,6 +75,8 @@ app.post('/webhook', function (req, res) {
   });
   res.sendStatus(200);
 });
+
+
 
 // Set Express to listen out for HTTP requests
 const server = app.listen(process.env.PORT || 3000, function () {
