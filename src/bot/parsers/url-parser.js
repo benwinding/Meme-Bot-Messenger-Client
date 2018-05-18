@@ -1,4 +1,4 @@
-const hlpr = require('../helpers');
+const hlpr = require('../../shared/helpers');
 const path = require('path');
 const rp = require('request-promise-native');
 

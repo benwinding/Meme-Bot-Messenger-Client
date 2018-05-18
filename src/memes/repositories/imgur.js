@@ -1,6 +1,6 @@
 const rp = require('request-promise-native');
 
-const hlpr = require('../helpers');
+const hlpr = require('../../shared/helpers');
 
 exports.GetRandomImage = () => {
   const url = 'https://api.imgur.com/3/gallery/random/random/1/';
