@@ -70,30 +70,6 @@ function GetQuickReplies() {
         },
         {
             "content_type":"text",
-            "title":"donate",
-            "payload":"PAY ME",
-            "image_url":"https://i.imgur.com/SGEnvkE.jpg"
-        },
-        {
-            "content_type":"text",
-            "title":"Help",
-            "payload":"HELP",
-            "image_url":"http://i.imgur.com/mV7Diob.png"
-        },
-        {
-            "content_type":"text",
-            "title":"mild",
-            "payload":"MILD",
-            "image_url":"http://i.imgur.com/HrdBnhZ.png"
-        },
-        {
-            "content_type":"text",
-            "title":"wild",
-            "payload":"WILD",
-            "image_url":"http://i.imgur.com/M1k4gZi.png"
-        },
-        {
-            "content_type":"text",
             "title":"MemEcon",
             "payload":"MEMECON",
             "image_url":"http://i.imgur.com/hNVgPhM.png"
@@ -104,6 +80,30 @@ function GetQuickReplies() {
             "payload":"SHARE ME",
             "image_url":"https://i.imgur.com/rs0VIuC.png"
         },
+        {
+            "content_type":"text",
+            "title":"Help",
+            "payload":"HELP",
+            "image_url":"http://i.imgur.com/mV7Diob.png"
+        },
+        {
+            "content_type":"text",
+            "title":"donate",
+            "payload":"PAY ME",
+            "image_url":"https://i.imgur.com/SGEnvkE.jpg"
+        },
+        {
+            "content_type":"text",
+            "title":"mild",
+            "payload":"MILD",
+            "image_url":"http://i.imgur.com/HrdBnhZ.png"
+        },
+        // {
+        //     "content_type":"text",
+        //     "title":"wild",
+        //     "payload":"WILD",
+        //     "image_url":"http://i.imgur.com/M1k4gZi.png"
+        // },
     ]
 }
 
