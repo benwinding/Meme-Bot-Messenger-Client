@@ -22,8 +22,10 @@
     "request": "^2.72.0",
     "jquery": "*",
     "jsdom": "*",
+    "pug": "*",
     "express": "*",
     "body-parser": "*",
+    "stripe": "*",
     "cheerio": "^0.22.0",
     "request-promise-native": "^1.0.4",
     "url-parse": "*"
