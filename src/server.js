@@ -3,9 +3,11 @@
 //
 'use strict';
 const express = require('express');
+const path = require('path');
 const bodyParser = require('body-parser');
 const hlpr = require('./shared/helpers');
 const Bot = require('./bot/bot');
+const messenger = require('./bot/messenger');
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -29,12 +31,42 @@ app.get('/webhook', function(req, res) {
   }
 });
 
-app.use(express.static('public'));
-// Display the web page
-app.get('/', function(req, res) {
-  res.send('index.html');
-  res.end();
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', ['*']);
+    res.append('X-Frame-Options', 'ALLOW-FROM https://messenger.com');
+    res.append('X-Frame-Options', 'ALLOW-FROM https://facebook.com');
+    res.append('X-Frame-Options', 'ALLOW-FROM https://fb.com');
+    res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.append('Access-Control-Allow-Headers', 'Content-Type');
+    next();
 });
+
+// Statically serve files
+app.use(express.static('src/public'));
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, '/views'));
+app.get('/donations/:name', function (req, res) {
+  let name = req.params.name;
+  res.render('donations', {firstName: name, STRIPE_API_KEY: process.env.STRIPE_API_KEY});
+})
+
+const stripe = require("stripe")(process.env.STRIPE_API_SECRET);
+app.post('/charged', function(req,res) {
+  // Token is created using Checkout or Elements!
+  // Get the payment token ID submitted by the form:
+  const token = req.body.stripeToken; // Using Express
+  
+  hlpr.log('Charge recieved, token: ', token);
+
+  const charge = stripe.charges.create({
+    amount: 300,
+    currency: 'aud',
+    description: 'Memebot Donation',
+    source: token,
+  });
+  res.render('thankyou');
+})
 
 // Message processing
 app.post('/webhook', function (req, res) {
@@ -68,6 +100,8 @@ app.post('/webhook', function (req, res) {
   });
   res.sendStatus(200);
 });
+
+
 
 // Set Express to listen out for HTTP requests
 const server = app.listen(process.env.PORT || 3000, function () {

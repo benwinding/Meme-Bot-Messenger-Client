@@ -69,38 +69,41 @@ function sendShareMe(recipientId) {
 }
 
 function sendPayMe(recipientId) {
-    const messageData = {
-        recipient: {
-            id: recipientId
-        },
-        message: {
-            "attachment":{
-                "type":"template",
-                "payload":{
-                    "template_type":"open_graph",
-                    "elements":[
-                        {
-                            "url":"https://payments-memebot.herokuapp.com/",
-                            "buttons":[
-                                {
-                                    "type":"web_url",
-                                    "url":"https://payments-memebot.herokuapp.com/",
-                                    "title":"See how!",
-                                    "webview_height_ratio": "tall",
-                                    "messenger_extensions": true
-                                }
-                            ]
-                        }
-                    ]
-                }
-            },
-            quick_replies: msgs.GetQuickReplies()
-        }
-    };
-
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending PayMe!!`);
-        callSendAPI(messageData)
+        getUser(recipientId).then((user) => {
+          let userName = user.first_name;
+          const messageData = {
+              recipient: {
+                  id: recipientId
+              },
+              "message":{
+                "attachment":{
+                  "type":"template",
+                  "payload":{
+                    "template_type":"generic",
+                    "elements":[
+                       {
+                        "title": `Thanks ${userName}, your donation helps`,
+                        "image_url":"https://i.imgur.com/drYGEoT.gif",
+                        "buttons":[
+                          {
+                            "type":"web_url",
+                            "url":"https://messenger-bot-test1.glitch.me/donations/"+userName,
+                            "title":"Donate Now "+userName+"!",
+                            "webview_height_ratio": "tall",
+                            "messenger_extensions": "false",
+                          }              
+                        ]      
+                      }
+                    ]
+                  }
+                },
+                quick_replies: msgs.GetQuickReplies()
+              }
+
+          }
+          callSendAPI(messageData)
             .then(() => {
                 resolve();
             })
@@ -108,6 +111,7 @@ function sendPayMe(recipientId) {
                 hlpr.err(`--Error sending pay me to messenger API`);
                 reject();
             })
+        })
     })
 }
 
@@ -185,6 +189,31 @@ function callSendAPI(messageData) {
     })
 }
 
+function getUser(recipientId) {
+    return new Promise((resolve, reject) => {
+        rp({
+            uri: 'https://graph.facebook.com/v2.6/'+recipientId,
+            qs: {
+              fields: "first_name,last_name,profile_pic,locale,timezone,gender",
+              access_token: process.env.PAGE_ACCESS_TOKEN 
+            },
+            method: 'GET',
+            json: true
+        })
+            .then((res) => {
+                hlpr.log(`Successfully sent message to recipient ${recipientId}`);
+                resolve(res);
+            })
+            .catch((err) => {
+                hlpr.err(`Message failed to send to id: ${recipientId}`, err);
+                let blankUser = {
+                  first_name: "Mr"
+                }
+                resolve(blankUser);
+            });
+    })
+}
+
 function getUserId(recipientId) {
     if(recipientId == 1300350910054687)
         return "BENNY";
@@ -198,4 +227,5 @@ module.exports = {
     SendText: sendText,
     SendVideo: sendVideo,
     SendPayMe: sendPayMe,
+    GetUser: getUser,
 };
