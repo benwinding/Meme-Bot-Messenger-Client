@@ -59,13 +59,13 @@ function parseAndSend(senderId, command) {
             sendText(senderId, msgs.GetHow());
             break;
         case "share":
-            messenger.SendShareMe(senderId);
+            sendThis(senderId, messenger.SendShareMe(senderId));
             break;
         case "help":
             sendText(senderId, msgs.GetHelp());
             break;
         case "donate":
-            messenger.SendPayMe(senderId);
+            sendThis(senderId, messenger.SendPayMe(senderId));
             break;
         case "welcome":
             sendText(senderId, msgs.GetWelcome());
@@ -77,25 +77,38 @@ function parseAndSend(senderId, command) {
     incrementCommandCounter(command);
 }
 
-function sendMeme(senderId, memePromise) {
-    memePromise.then((Url) => {
-        if(urls.IsVideo(Url))
-            messenger.SendVideo(senderId, Url);
+function sendMeme(senderId, getUrlPromise) {
+    messenger.SendIsTyping(senderId, true)
+      .then(() => getUrlPromise)
+      .then((url) => {
+        if(urls.IsVideo(url))
+            return messenger.SendVideo(senderId, url);
         else
-            messenger.SendImage(senderId, Url);
-    })
-    .catch((err) => {
-        hlpr.err('Error Bot.SendMeme: ', err);
-    });
+            return messenger.SendImage(senderId, url);
+      })
+      .then(() => messenger.SendIsTyping(senderId, false))
+      .catch((err) => {
+          hlpr.err('Error Bot.SendMeme: ', err);
+      });
 }
 
-function sendText(senderId, memePromise) {
-    memePromise.then((textMessage) => {
-        messenger.SendText(senderId, textMessage);
-    })
-    .catch((err) => {
-        hlpr.err('Error Bot.SendText: ', err);
-    });
+function sendText(senderId, getTextPromise) {
+    messenger.SendIsTyping(senderId, true)
+      .then(() => getTextPromise)
+      .then((textMessage) => messenger.SendText(senderId, textMessage))
+      .then(() => messenger.SendIsTyping(senderId, false))
+      .catch((err) => {
+          hlpr.err('Error Bot.SendText: ', err);
+      });
+}
+
+function sendThis(senderId, sendPromise) {
+    messenger.SendIsTyping(senderId, true)
+      .then(() => sendPromise)
+      .then(() => messenger.SendIsTyping(senderId, false))
+      .catch((err) => {
+          hlpr.err('Error Bot.SendThis: ', err);
+      });
 }
 
 function incrementCommandCounter(label) {

@@ -115,6 +115,29 @@ function sendPayMe(recipientId) {
     })
 }
 
+function sendIsTyping(recipientId, isTyping) {
+    if(!isTyping)
+        isTyping = false;
+    const typingStr = isTyping? "typing_on" : "typing_off";
+    const messageData = {
+        recipient: {
+            id: recipientId
+        },
+        sender_action: typingStr
+    };
+    return new Promise((resolve, reject) => {
+        hlpr.log(`--Sending isTyping= ${isTyping}`);
+        callSendAPI(messageData)
+            .then(() => {
+                resolve();
+            })
+            .catch(() => {
+                hlpr.err(`--Error sending isTyping to messenger API`);
+                reject();
+            })
+    })
+}
+
 function sendText(recipientId, messageText) {
     if(messageText == null || messageText == "")
         messageText = "";
@@ -167,27 +190,6 @@ function sendVideo(recipientId, imageUrl) {
             })
     })
 }
-/// Privates
-
-function callSendAPI(messageData) {
-    return new Promise((resolve, reject) => {
-        const recipientId = getUserId(messageData.recipient.id);
-        rp({
-            uri: 'https://graph.facebook.com/v2.6/me/messages',
-            qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
-            method: 'POST',
-            json: messageData
-        })
-            .then(() => {
-                hlpr.log(`Successfully sent message to recipient ${recipientId}`);
-                resolve();
-            })
-            .catch((err) => {
-                hlpr.err(`Message failed to send to id: ${recipientId}`, err);
-                reject();
-            });
-    })
-}
 
 function getUser(recipientId) {
     return new Promise((resolve, reject) => {
@@ -214,6 +216,28 @@ function getUser(recipientId) {
     })
 }
 
+/// Privates
+
+function callSendAPI(messageData) {
+    return new Promise((resolve, reject) => {
+        const recipientId = getUserId(messageData.recipient.id);
+        rp({
+            uri: 'https://graph.facebook.com/v2.6/me/messages',
+            qs: { access_token: process.env.PAGE_ACCESS_TOKEN },
+            method: 'POST',
+            json: messageData
+        })
+            .then(() => {
+                hlpr.log(`Successfully sent message to recipient ${recipientId}`);
+                resolve();
+            })
+            .catch((err) => {
+                hlpr.err(`Message failed to send to id: ${recipientId}`, err);
+                reject();
+            });
+    })
+}
+
 function getUserId(recipientId) {
     if(recipientId == 1300350910054687)
         return "BENNY";
@@ -228,4 +252,5 @@ module.exports = {
     SendVideo: sendVideo,
     SendPayMe: sendPayMe,
     GetUser: getUser,
+    SendIsTyping: sendIsTyping,
 };

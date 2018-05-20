@@ -1,32 +1,52 @@
 const hlpr = require('../../shared/helpers');
 
 const commandAliases = {
-    "meme": ["meme", "normal", ":)", "👍", "", null, undefined],
-    "hot": ["hot"],
-    "dank": ["dank"],
-    "random": ["random", "mild"],
-    "xxx": ["xxx", "wild"],
-    "why": ["why", "fuck", "fuck you"],
-    "how": ["how"],
-    "welcome": ["welcome"],
-    "help": ["help"],
-    "share": ["share", "share me"],
-    "donate": ["donate", "pay me", "help me"],
-    "memecon": ["memecon", "MemEcon", "MemeEconomy"],
+    "meme": "meme",
+    "normal": "meme",
+    "": "meme",
+    "👍": "meme",
+
+    "hot": "hot",
+
+    "dank": "dank",
+
+    "random": "random",
+
+    "mild": "mild",
+
+    "xxx": "xxx",
+
+    "wild": "wild",
+
+    "why": "why",
+    "fuck": "why",
+    "fuck you": "why",
+
+    "how": "how",
+
+    "welcome": "welcome",
+
+    "help": "help",
+
+    "share": "share",
+    "share me": "share",
+
+    "donate": "donate",
+    "pay me": "donate",
+    "help me": "donate",
+
+    "memecon": "memecon",
+    "MemEcon": "memecon",
+    "MemeEconomy": "memecon",
 };
+
 exports.ParseCommand = (input) => {
   if(!input)
     input = "";
-  let parsedCommand = "help";
   let inputLower = input.toLowerCase();
-  for(let currentCommand in commandAliases) {
-    const aliases = commandAliases[currentCommand];
-    for(let alias of aliases) {
-      if(alias == inputLower) {
-        parsedCommand = currentCommand;
-      }
-    }
-  }
+  let parsedCommand = commandAliases[inputLower];
+  if(!parsedCommand)
+    parsedCommand = "help";
   hlpr.log(`--Input: '${input}' parsed to command: '${parsedCommand}'`);
   return parsedCommand;
 };
