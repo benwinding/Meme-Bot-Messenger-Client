@@ -25,6 +25,8 @@ const commandAliases = {
     "how": "how",
 
     "welcome": "welcome",
+    "hey": "welcome",
+    "yo": "welcome",
 
     "help": "help",
 
@@ -46,7 +48,7 @@ exports.ParseCommand = (input) => {
   let inputLower = input.toLowerCase();
   let parsedCommand = commandAliases[inputLower];
   if(!parsedCommand)
-    parsedCommand = "help";
+    parsedCommand = "welcome";
   hlpr.log(`--Input: '${input}' parsed to command: '${parsedCommand}'`);
   return parsedCommand;
 };
