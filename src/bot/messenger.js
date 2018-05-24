@@ -20,9 +20,7 @@ function sendImage(recipientId, imageUrl) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending image with url: ${imageUrl}`);
         callSendAPI(messageData)
-            .then(() => {
-                resolve();
-            })
+            .then(resolve)
             .catch(() => {
                 hlpr.err(`--Error sending image to messenger API`);
                 reject();
@@ -153,9 +151,7 @@ function sendText(recipientId, messageText) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending message with text and quick_replies: ${messageText}`);
         callSendAPI(messageData)
-            .then(() => {
-                resolve();
-            })
+            .then(resolve)
             .catch(() => {
                 hlpr.err(`--Error sending text to messenger API`);
                 reject();
@@ -181,9 +177,7 @@ function sendVideo(recipientId, imageUrl) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending video with url: ${imageUrl}`);
         callSendAPI(messageData)
-            .then(() => {
-                resolve();
-            })
+            .then(resolve)
             .catch(() => {
                 hlpr.err(`--Error sending video to messenger API`);
                 reject();
@@ -228,11 +222,11 @@ function callSendAPI(messageData) {
             json: messageData
         })
             .then(() => {
-                hlpr.log(`Successfully sent message to recipient ${recipientId}`);
+                // hlpr.log(`Successfully sent message to recipient ${recipientId}`);
                 resolve();
             })
             .catch((err) => {
-                hlpr.err(`Message failed to send to id: ${recipientId}`, err);
+                hlpr.err(`callSendAPI: Message failed to send to id: ${recipientId}`, err);
                 reject();
             });
     })

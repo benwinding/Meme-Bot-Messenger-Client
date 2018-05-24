@@ -1,27 +1,25 @@
 const rp = require('request-promise-native');
-
 const hlpr = require('../../shared/helpers');
 
-exports.GetRandomImage = () => {
+function GetRandomImage() {
   const url = 'https://api.imgur.com/3/gallery/random/random/1/';
   return new Promise((resolve, reject) => {
     rp({
       uri: url,
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
+      },
+      json: true
     })
-    .then((body) => { 
-      const parsed = JSON.parse(body);
-      GetImageFromResponse(parsed.data, 2)
-      .then(resolve)
-      .catch(reject);
+    .then((body) => {
+      return GetImageFromResponse(body.data, 2);
     })
+    .then(resolve)
     .catch(reject);
   }) 
 };
 
-exports.GetMemeImage = (timePeriod, pageLast, itemsLast) => {
+function GetMemeImage(timePeriod, pageLast, itemsLast) {
   const imgurPrefix = 'https://api.imgur.com/3/gallery/t/dump/top/';
   const url = imgurPrefix + timePeriod + '/' + hlpr.getRandomNumberEven(0, pageLast);
   return new Promise((resolve, reject) => {
@@ -29,93 +27,113 @@ exports.GetMemeImage = (timePeriod, pageLast, itemsLast) => {
       uri: url,
       headers: {
         'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
+      },
+      json: true
     })
     .then((body) => { 
-      const parsed = JSON.parse(body);
-      GetImageFromResponse(parsed.data.items, itemsLast)
-      .then(resolve);
+      const parsed = body;
+      return GetImageFromResponse(parsed.data.items, itemsLast);
     })
+    .then(resolve)
     .catch(reject);
   }) 
 };
 
-exports.GetSubRedditImage = (subReddit, timePeriod, pageLast, itemsLast) => {
-  const prefix = 'https://api.imgur.com/3/gallery/r/';
+const prefix = 'https://api.imgur.com/3/gallery/r/';
+function GetSubRedditImage(subReddit, timePeriod, pageLast, itemsLast) {
   const url = prefix + subReddit + '/top/' + timePeriod + '/' + hlpr.getRandomNumberEven(0, pageLast);
   return new Promise((resolve, reject) => {
     rp({
       uri: url,
       headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
+        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID,
+      },
+      json: true
     })
     .then((body) => { 
-      const galleryResponse = JSON.parse(body);
       hlpr.log(`--Finding memes in 'subreddit' subReddit:${subReddit}, time: ${timePeriod}, pages:${pageLast}, numItems:${itemsLast}`);
-      hlpr.log(`--Found: ${galleryResponse.data.length}, albumns or single images`);
-      GetImageFromResponse(galleryResponse.data, itemsLast)
-      .then(resolve)
-      .catch(reject);
-    })
-    .catch(reject);
-  }) 
-};
-
-exports.sendMemeSearched = (recipientId, searchMeme, itemsLast) => {
-  const url = 'https://api.imgur.com/3/gallery/search/top/0?q=meme%20' + searchMeme;
-  return new Promise((resolve, reject) => {
-    rp({
-      uri: url,
-      headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
-    })
-    .then((body) => { 
-      const galleryResponse = JSON.parse(body);
-      if(galleryResponse.data.length == 0)
+      hlpr.log(`  Url: ${url}`);
+      if(!body.data) {
         reject();
-      else {
-        GetImageFromResponse(galleryResponse.data, itemsLast)
-        .then(resolve);
+        return;
       }
+      hlpr.log(`  Found: ${body.data.length}, albumns or single images`);
+      if(body.data.length == 0) {
+        hlpr.log(`  No images found? reponse =`, body);
+      }
+      return GetImageFromResponse(body.data, itemsLast)
+        .then(resolve)
+        .catch(reject);
     })
+    .then(resolve)
     .catch(reject);
   }) 
 };
 
+
+module.exports = {
+  GetRandomImage: GetRandomImage,
+  GetMemeImage: GetMemeImage,
+  GetSubRedditImage: GetSubRedditImage,
+}
+
+var done = false;
 function GetImageFromResponse(list, itemsLast) {
   return new Promise((resolve, reject) => {
-    const firstBest = list.slice(0, itemsLast);
-    const randomGalleryItem = hlpr.getRandomItemFromArray(firstBest);
+    const subList = list.slice(0, itemsLast);
+    const randomGalleryItem = hlpr.getRandomItemFromArray(subList);
     let imgUrl;
     if(randomGalleryItem == null) {
-      reject();
+      reject(`  gallery item == null`);
+      return;
     }
     else if(randomGalleryItem.is_album) {
-      GetRandomAlbumnImage(randomGalleryItem.id)
-      .then((url) => {resolve(url)})
-      .catch(reject);              
+      let galleryId
+      if(done)
+        galleryId = randomGalleryItem.id;
+      else 
+      {
+        done = true;
+        galleryId = 'C2DMwSD'; //randomGalleryItem.id;
+      }
+      hlpr.log(`  Selected Album: ${galleryId}`);
+      return GetRandomAlbumnImage(galleryId)
+        .then(resolve)
+        .catch((err) => {
+          hlpr.err(`  Failed to get album image`, err);
+          reject(`  Failed to get album image`);
+        });
     }
     else {
-      resolve(randomGalleryItem.link);
+      hlpr.log(`  Selected Image: ${randomGalleryItem.link}`);
+       resolve(randomGalleryItem.link);
     }
   })
 }
 
 function GetRandomAlbumnImage(id) {
   return new Promise((resolve, reject) => {
+    let url = "https://api.imgur.com/3/gallery/album/" + id;
     rp({
-      url: "https://api.imgur.com/3/gallery/album/" + id,
+      url: url,
       headers: {
-        'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
-      }
+          'Authorization': 'Client-ID ' + process.env.IMG_CLIENT_ID
+      },
+      json: true
     })
     .then((body) => {
-      const imgurApiResponse = JSON.parse(body);
-      const randomAblumnImage = hlpr.getRandomItemFromArray(imgurApiResponse.data.images);
+      if(!body.data || !body.data.images) {
+        reject('! bad response, url=' + url );
+        return;
+      }
+      const randomAblumnImage = hlpr.getRandomItemFromArray(body.data.images);
       resolve(randomAblumnImage.link);
     })
-    .catch(reject);
+    .catch((err) => {
+      if(err.error)
+        reject(err.error);
+      else
+        reject(err);
+    });
   })
 }
