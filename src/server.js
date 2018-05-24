@@ -7,7 +7,6 @@ const path = require('path');
 const bodyParser = require('body-parser');
 const hlpr = require('./shared/helpers');
 const Bot = require('./bot/bot');
-const messenger = require('./bot/messenger');
 
 // The rest of the code implements the routes for our Express server.
 let app = express();
@@ -49,7 +48,7 @@ app.set('views', path.join(__dirname, '/views'));
 app.get('/donations/:name', function (req, res) {
   let name = req.params.name;
   res.render('donations', {firstName: name, STRIPE_API_KEY: process.env.STRIPE_API_KEY});
-})
+});
 
 const stripe = require("stripe")(process.env.STRIPE_API_SECRET);
 app.post('/charged', function(req,res) {
@@ -66,7 +65,7 @@ app.post('/charged', function(req,res) {
     source: token,
   });
   res.render('thankyou');
-})
+});
 
 // Message processing
 app.post('/webhook', function (req, res) {

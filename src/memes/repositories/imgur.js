@@ -16,9 +16,9 @@ function GetRandomImage() {
     })
     .then(resolve)
     .catch(reject);
-  }) 
-};
+  })
 
+}
 function GetMemeImage(timePeriod, pageLast, itemsLast) {
   const imgurPrefix = 'https://api.imgur.com/3/gallery/t/dump/top/';
   const url = imgurPrefix + timePeriod + '/' + hlpr.getRandomNumberEven(0, pageLast);
@@ -30,15 +30,14 @@ function GetMemeImage(timePeriod, pageLast, itemsLast) {
       },
       json: true
     })
-    .then((body) => { 
-      const parsed = body;
-      return GetImageFromResponse(parsed.data.items, itemsLast);
+    .then((body) => {
+      return GetImageFromResponse(body.data.items, itemsLast);
     })
     .then(resolve)
     .catch(reject);
-  }) 
-};
+  })
 
+}
 const prefix = 'https://api.imgur.com/3/gallery/r/';
 function GetSubRedditImage(subReddit, timePeriod, pageLast, itemsLast) {
   const url = prefix + subReddit + '/top/' + timePeriod + '/' + hlpr.getRandomNumberEven(0, pageLast);
@@ -58,7 +57,7 @@ function GetSubRedditImage(subReddit, timePeriod, pageLast, itemsLast) {
         return;
       }
       hlpr.log(`  Found: ${body.data.length}, albumns or single images`);
-      if(body.data.length == 0) {
+      if(body.data.length === 0) {
         hlpr.log(`  No images found? reponse =`, body);
       }
       return GetImageFromResponse(body.data, itemsLast)
@@ -67,17 +66,17 @@ function GetSubRedditImage(subReddit, timePeriod, pageLast, itemsLast) {
     })
     .then(resolve)
     .catch(reject);
-  }) 
-};
+  })
 
-
+}
 module.exports = {
   GetRandomImage: GetRandomImage,
   GetMemeImage: GetMemeImage,
   GetSubRedditImage: GetSubRedditImage,
-}
+};
 
-var done = false;
+let done = false;
+
 function GetImageFromResponse(list, itemsLast) {
   return new Promise((resolve, reject) => {
     const subList = list.slice(0, itemsLast);
@@ -85,24 +84,11 @@ function GetImageFromResponse(list, itemsLast) {
     let imgUrl;
     if(randomGalleryItem == null) {
       reject(`  gallery item == null`);
-      return;
     }
     else if(randomGalleryItem.is_album) {
-      let galleryId
-      if(done)
-        galleryId = randomGalleryItem.id;
-      else 
-      {
-        done = true;
-        galleryId = 'C2DMwSD'; //randomGalleryItem.id;
-      }
+      let galleryId = randomGalleryItem.id;
       hlpr.log(`  Selected Album: ${galleryId}`);
-      return GetRandomAlbumnImage(galleryId)
-        .then(resolve)
-        .catch((err) => {
-          hlpr.err(`  Failed to get album image`, err);
-          reject(`  Failed to get album image`);
-        });
+      resolve(GetRandomAlbumnImage(galleryId));
     }
     else {
       hlpr.log(`  Selected Image: ${randomGalleryItem.link}`);

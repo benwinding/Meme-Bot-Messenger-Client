@@ -32,12 +32,10 @@ function handlePostBackRecieved(senderId, postback) {
     parseAndSend(senderId, command);
 }
 
-const imgur = require('../memes/repositories/imgur');
 function parseAndSend(senderId, command) {
     switch(command) {
         case "meme":
-            sendMeme(senderId, imgur.GetSubRedditImage("MemeEconomy", 'week', 1, 1));
-            // sendMeme(senderId, meme.GetMeme());
+            sendMeme(senderId, meme.GetMeme());
             break;
         case "dank":
             sendMeme(senderId, meme.GetImgurSubreddit("dankmemes"));
