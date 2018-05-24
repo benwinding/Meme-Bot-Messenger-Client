@@ -32,10 +32,12 @@ function handlePostBackRecieved(senderId, postback) {
     parseAndSend(senderId, command);
 }
 
+const imgur = require('../memes/repositories/imgur');
 function parseAndSend(senderId, command) {
     switch(command) {
         case "meme":
-            sendMeme(senderId, meme.GetMeme());
+            sendMeme(senderId, imgur.GetSubRedditImage("MemeEconomy", 'week', 1, 1));
+            // sendMeme(senderId, meme.GetMeme());
             break;
         case "dank":
             sendMeme(senderId, meme.GetImgurSubreddit("dankmemes"));
@@ -89,6 +91,8 @@ function sendMeme(senderId, getUrlPromise) {
       .then(() => messenger.SendIsTyping(senderId, false))
       .catch((err) => {
           hlpr.err('Error Bot.SendMeme: ', err);
+          hlpr.log('Sending safe meme');
+          sendSafeMeme(senderId);
       });
 }
 
@@ -109,6 +113,10 @@ function sendThis(senderId, sendPromise) {
       .catch((err) => {
           hlpr.err('Error Bot.SendThis: ', err);
       });
+}
+
+function sendSafeMeme(senderId) {
+    sendThis(senderId, sendMeme(senderId, meme.GetMeme()));
 }
 
 function incrementCommandCounter(label) {
