@@ -33,6 +33,7 @@ function parseAndSend(senderId, input) {
       if(!input)
         input = "";
       let inputLower = input.toLowerCase();
+
       switch(inputLower) {
         case "meme":
             sendMeme(senderId, meme.GetMeme());
@@ -86,7 +87,7 @@ function parseAndSend(senderId, input) {
             sendText(senderId, msgs.GetWelcome());
             break;
     }
-    incrementCommandCounter(command);
+    incrementCommandCounter(inputLower);
 }
 
 function sendMeme(senderId, getUrlPromise) {
