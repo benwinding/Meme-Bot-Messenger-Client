@@ -33,7 +33,7 @@ function parseAndSend(senderId, input) {
       if(!input)
         input = "";
       let inputLower = input.toLowerCase();
-      switch(command) {
+      switch(inputLower) {
         case "meme":
             sendMeme(senderId, meme.GetMeme());
             break;
