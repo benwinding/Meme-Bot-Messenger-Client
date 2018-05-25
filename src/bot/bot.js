@@ -1,5 +1,4 @@
 const rp = require('request-promise-native');
-const prsr = require('./parsers/alias-parser');
 const urls = require('./parsers/url-parser');
 const messenger = require('./messenger');
 const msgs = require('./static-messages');
@@ -17,8 +16,7 @@ function handleMessageRecieved(senderId, message) {
     else
         input = "meme";
 
-    const command = prsr.ParseCommand(input);
-    parseAndSend(senderId, command);
+    parseAndSend(senderId, input);
 }
 
 function handlePostBackRecieved(senderId, postback) {
@@ -28,12 +26,14 @@ function handlePostBackRecieved(senderId, postback) {
     else
         input = postback.payload;
 
-    const command = prsr.ParseCommand(input);
-    parseAndSend(senderId, command);
+    parseAndSend(senderId, input);
 }
 
-function parseAndSend(senderId, command) {
-    switch(command) {
+function parseAndSend(senderId, input) {
+      if(!input)
+        input = "";
+      let inputLower = input.toLowerCase();
+      switch(command) {
         case "meme":
             sendMeme(senderId, meme.GetMeme());
             break;
@@ -43,27 +43,39 @@ function parseAndSend(senderId, command) {
         case "hot":
             sendMeme(senderId, meme.GetHot());
             break;
+        case "wild":
         case "xxx":
             sendMeme(senderId, meme.GetImgurSubreddit("SFWPornGifs"));
             break;
+        case "mild":
         case "random":
             sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
             break;
+        case "MemEcon":
+        case "MemeEconomy":
         case "memecon":
             sendMeme(senderId, meme.GetImgurSubreddit("MemeEconomy"));
             break;
+        case "fuck":
+        case "fuck you":
         case "why":
             sendText(senderId, msgs.GetWhy());
             break;
         case "how":
             sendText(senderId, msgs.GetHow());
             break;
+        case "share me":
         case "share":
             sendThis(senderId, messenger.SendShareMe(senderId));
             break;
+        case "welcome":
+        case "hey":
+        case "yo":
         case "help":
+        case "help me":
             sendText(senderId, msgs.GetHelp());
             break;
+        case "pay me":
         case "donate":
             sendThis(senderId, messenger.SendPayMe(senderId));
             break;
