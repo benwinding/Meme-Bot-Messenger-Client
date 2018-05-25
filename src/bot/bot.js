@@ -1,5 +1,5 @@
 const rp = require('request-promise-native');
-const urls = require('./parsers/url-parser');
+const urls = require('./url-parser');
 const messenger = require('./messenger');
 const msgs = require('./static-messages');
 const meme = require('../memes/meme-fetcher');
