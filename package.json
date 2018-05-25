@@ -15,6 +15,9 @@
     "bot",
     "quickstart"
   ],
+  "engines": {
+    "node": "6.x"
+  },
   "author": "Mikhail Larionov <mlarionov@fb.com>",
   "license": "MIT",
   "homepage": "https://developers.facebook.com/docs/messenger-platform/guides/quick-start",

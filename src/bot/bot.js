@@ -32,9 +32,8 @@ function handlePostBackRecieved(senderId, postback) {
 function parseAndSend(senderId, input) {
     if(!input)
         input = "";
-    let inputLower = input.toLowerCase();
-
-    switch(inputLower) {
+    let command = input.toLowerCase();
+    switch(command) {
         case "send memes":
         case "meme":
         case "good":
@@ -86,11 +85,12 @@ function parseAndSend(senderId, input) {
         case "hey":
         case "yo":
             sendText(senderId, msgs.GetWelcome());
+            break;
         default:
             sendText(senderId, msgs.GetWelcome());
             break;
     }
-    incrementCommandCounter(inputLower);
+    incrementCommandCounter(command);
 }
 
 function sendMeme(senderId, getUrlPromise) {
