@@ -52,6 +52,8 @@ function parseAndSend(senderId, input) {
             sendMeme(senderId, meme.GetImgurSubreddit("SFWPornGifs"));
             break;
         case "mild":
+            sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
+            break;
         case "random":
             sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
             break;
