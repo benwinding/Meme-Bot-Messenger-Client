@@ -1,8 +1,13 @@
-const hlpr = require('../../shared/helpers');
+const hlpr = require('../shared/helpers');
 const path = require('path');
 const rp = require('request-promise-native');
 
-exports.ValidateUrl = (url) => {
+module.exports = {
+  ValidateUrl: ValidateUrl,
+  IsVideo: IsVideo,
+}
+
+function ValidateUrl(url) {
   hlpr.log("validating url: " + url);
   return new Promise(function (resolve, reject) {
     const options = {
@@ -10,18 +15,12 @@ exports.ValidateUrl = (url) => {
       uri: url
     };
     rp(options)
-    .then(() => { 
-      hlpr.log("valid url!");
-      resolve(url) 
-    })
-    .catch((error) => {
-      hlpr.log("Invalid url!");
-      reject(error)
-    });
+    .then(resolve(url))
+    .catch((error) => reject("Invalid url!: " + JSON.stringify(error)));
   });
 };
 
-exports.IsVideo = (url) => {
+function IsVideo(url) {
   const ext = path.extname(url);
   switch(ext) {
     case ".webm":

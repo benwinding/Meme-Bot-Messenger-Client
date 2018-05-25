@@ -21,10 +21,7 @@ function sendImage(recipientId, imageUrl) {
         hlpr.log(`--Sending image with url: ${imageUrl}`);
         callSendAPI(messageData)
             .then(resolve)
-            .catch(() => {
-                hlpr.err(`--Error sending image to messenger API`);
-                reject();
-            })
+            .catch((err) => reject(`--Error sending image to messenger API: ${JSON.stringify(err)}`));
     })
 }
 
@@ -56,60 +53,51 @@ function sendShareMe(recipientId) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending ShareMe!!`);
         callSendAPI(messageData)
-            .then(() => {
-                resolve();
-            })
-            .catch(() => {
-                hlpr.err(`--Error sending share to messenger API`);
-                reject();
-            })
+            .then(resolve)
+            .catch((err) => reject(`--Error sending share to messenger API: ${JSON.stringify(err)}`));
     })
 }
 
 function sendPayMe(recipientId) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending PayMe!!`);
-        getUser(recipientId).then((user) => {
-          let userName = user.first_name;
-          const messageData = {
-              recipient: {
-                  id: recipientId
-              },
-              "message":{
-                "attachment":{
-                  "type":"template",
-                  "payload":{
-                    "template_type":"generic",
-                    "elements":[
-                       {
-                        "title": `Thanks ${userName}, your donation helps`,
-                        "image_url":"https://i.imgur.com/drYGEoT.gif",
-                        "buttons":[
-                          {
-                            "type":"web_url",
-                            "url":"https://messenger-bot-test1.glitch.me/donations/"+userName,
-                            "title":"Donate Now "+userName+"!",
-                            "webview_height_ratio": "tall",
-                            "messenger_extensions": "false",
-                          }              
-                        ]      
-                      }
-                    ]
-                  }
-                },
-                quick_replies: msgs.GetQuickReplies()
-              }
+        getUser(recipientId)
+            .then((user) => {
+                let userName = user.first_name;
+                const messageData = {
+                    recipient: {
+                        id: recipientId
+                    },
+                    "message":{
+                        "attachment":{
+                            "type":"template",
+                            "payload":{
+                                "template_type":"generic",
+                                "elements":[
+                                    {
+                                        "title": `Thanks ${userName}, your donation helps`,
+                                        "image_url":"https://i.imgur.com/drYGEoT.gif",
+                                        "buttons":[
+                                            {
+                                                "type":"web_url",
+                                                "url":"https://messenger-bot-test1.glitch.me/donations/"+userName,
+                                                "title":"Donate Now "+userName+"!",
+                                                "webview_height_ratio": "tall",
+                                                "messenger_extensions": "false",
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        quick_replies: msgs.GetQuickReplies()
+                    }
 
-          }
-          callSendAPI(messageData)
-            .then(() => {
-                resolve();
+                };
+                callSendAPI(messageData)
+                    .then(resolve)
+                    .catch((err) => reject(`--Error sending pay me to messenger API: ${JSON.stringify(err)}`));
             })
-            .catch(() => {
-                hlpr.err(`--Error sending pay me to messenger API`);
-                reject();
-            })
-        })
     })
 }
 
@@ -126,18 +114,13 @@ function sendIsTyping(recipientId, isTyping) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending isTyping= ${isTyping}`);
         callSendAPI(messageData)
-            .then(() => {
-                resolve();
-            })
-            .catch(() => {
-                hlpr.err(`--Error sending isTyping to messenger API`);
-                reject();
-            })
+            .then(resolve)
+            .catch((err) => reject(`--Error sending isTyping to messenger API: ${JSON.stringify(err)}`));
     })
 }
 
 function sendText(recipientId, messageText) {
-    if(messageText == null || messageText == "")
+    if(messageText == null || messageText === "")
         messageText = "";
     const messageData = {
         recipient: {
@@ -152,10 +135,7 @@ function sendText(recipientId, messageText) {
         hlpr.log(`--Sending message with text and quick_replies: ${messageText}`);
         callSendAPI(messageData)
             .then(resolve)
-            .catch(() => {
-                hlpr.err(`--Error sending text to messenger API`);
-                reject();
-            })
+            .catch((err) => reject(`--Error sending text to messenger API: ${JSON.stringify(err)}`));
     })
 }
 
@@ -178,10 +158,7 @@ function sendVideo(recipientId, imageUrl) {
         hlpr.log(`--Sending video with url: ${imageUrl}`);
         callSendAPI(messageData)
             .then(resolve)
-            .catch(() => {
-                hlpr.err(`--Error sending video to messenger API`);
-                reject();
-            })
+            .catch((err) => reject(`--Error sending video to messenger API: ${JSON.stringify(err)}`));
     })
 }
 
@@ -190,21 +167,18 @@ function getUser(recipientId) {
         rp({
             uri: 'https://graph.facebook.com/v2.6/'+recipientId,
             qs: {
-              fields: "first_name,last_name,profile_pic,locale,timezone,gender",
-              access_token: process.env.PAGE_ACCESS_TOKEN 
+                fields: "first_name,last_name,profile_pic,locale,timezone,gender",
+                access_token: process.env.PAGE_ACCESS_TOKEN
             },
             method: 'GET',
             json: true
         })
-            .then((res) => {
-                hlpr.log(`Successfully sent message to recipient ${recipientId}`);
-                resolve(res);
-            })
+            .then(resolve)
             .catch((err) => {
-                hlpr.err(`Message failed to send to id: ${recipientId}`, err);
+                hlpr.err(`Message failed to getUser from id: ${recipientId}`, err);
                 let blankUser = {
-                  first_name: "Mr"
-                }
+                    first_name: "Mr"
+                };
                 resolve(blankUser);
             });
     })
@@ -221,19 +195,13 @@ function callSendAPI(messageData) {
             method: 'POST',
             json: messageData
         })
-            .then(() => {
-                // hlpr.log(`Successfully sent message to recipient ${recipientId}`);
-                resolve();
-            })
-            .catch((err) => {
-                hlpr.err(`callSendAPI: Message failed to send to id: ${recipientId}`, err);
-                reject();
-            });
+            .then(resolve)
+            .catch((err) => reject(`--Error : Message failed to send to id: ${recipientId}, err: ${JSON.stringify(err)}`));
     })
 }
 
 function getUserId(recipientId) {
-    if(recipientId == 1300350910054687)
+    if(recipientId === 1300350910054687)
         return "BENNY";
     else
         return recipientId;
@@ -245,6 +213,5 @@ module.exports = {
     SendText: sendText,
     SendVideo: sendVideo,
     SendPayMe: sendPayMe,
-    GetUser: getUser,
     SendIsTyping: sendIsTyping,
 };
