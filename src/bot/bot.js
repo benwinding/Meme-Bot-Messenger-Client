@@ -33,44 +33,55 @@ function parseAndSend(senderId, input) {
     if(!input)
         input = "";
     let command = input.toLowerCase();
+    let parsed = "welcome";
     switch(command) {
-        case "send memes":
-        case "meme":
         case "good":
+        case "send memes":
         case "memes":
+        case "meme":
+            parsed = "meme";
             sendMeme(senderId, meme.GetMeme());
             break;
         case "dank":
+            parsed = "dank";
             sendMeme(senderId, meme.GetImgurSubreddit("dankmemes"));
             break;
         case "hot":
+            parsed = "hot";
             sendMeme(senderId, meme.GetHot());
             break;
         case "wild":
         case "xxx":
+            parsed = "xxx";
             sendMeme(senderId, meme.GetImgurSubreddit("SFWPornGifs"));
             break;
         case "mild":
+            parsed = "mild";
             sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
             break;
         case "random":
+            parsed = "random";
             sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
             break;
         case "MemEcon":
         case "MemeEconomy":
         case "memecon":
+            parsed = "memecon";
             sendMeme(senderId, meme.GetImgurSubreddit("MemeEconomy"));
             break;
         case "fuck":
         case "fuck you":
         case "why":
+            parsed = "why";
             sendText(senderId, msgs.GetWhy());
             break;
         case "how":
+            parsed = "how";
             sendText(senderId, msgs.GetHow());
             break;
         case "share me":
         case "share":
+            parsed = "share";
             sendThis(senderId, messenger.SendShareMe(senderId));
             break;
         case "help":
@@ -79,18 +90,20 @@ function parseAndSend(senderId, input) {
             break;
         case "pay me":
         case "donate":
+            parsed = "donate";
             sendThis(senderId, messenger.SendPayMe(senderId));
             break;
-        case "welcome":
         case "hey":
         case "yo":
+        case "welcome":
+            parsed = "welcome";
             sendText(senderId, msgs.GetWelcome());
             break;
         default:
             sendText(senderId, msgs.GetWelcome());
             break;
     }
-    incrementCommandCounter(command);
+    incrementCommandCounter(parsed);
 }
 
 function sendMeme(senderId, getUrlPromise) {
