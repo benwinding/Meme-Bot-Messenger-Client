@@ -35,7 +35,10 @@ function parseAndSend(senderId, input) {
       let inputLower = input.toLowerCase();
 
       switch(inputLower) {
+        case "send memes":
         case "meme":
+        case "good":
+        case "memes":
             sendMeme(senderId, meme.GetMeme());
             break;
         case "dank":
@@ -81,8 +84,6 @@ function parseAndSend(senderId, input) {
             sendThis(senderId, messenger.SendPayMe(senderId));
             break;
         case "welcome":
-            sendText(senderId, msgs.GetWelcome());
-            break;
         default:
             sendText(senderId, msgs.GetWelcome());
             break;
