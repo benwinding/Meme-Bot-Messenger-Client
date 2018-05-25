@@ -1,7 +1,7 @@
 const rp = require('request-promise-native');
 const urls = require('./url-parser');
-const messenger = require('./messenger');
 const msgs = require('./static-messages');
+const messenger = require('./messenger');
 const meme = require('../memes/meme-fetcher');
 const hlpr = require('../shared/helpers');
 
@@ -30,11 +30,11 @@ function handlePostBackRecieved(senderId, postback) {
 }
 
 function parseAndSend(senderId, input) {
-      if(!input)
+    if(!input)
         input = "";
-      let inputLower = input.toLowerCase();
+    let inputLower = input.toLowerCase();
 
-      switch(inputLower) {
+    switch(inputLower) {
         case "send memes":
         case "meme":
         case "good":
@@ -74,9 +74,6 @@ function parseAndSend(senderId, input) {
         case "share":
             sendThis(senderId, messenger.SendShareMe(senderId));
             break;
-        case "welcome":
-        case "hey":
-        case "yo":
         case "help":
         case "help me":
             sendText(senderId, msgs.GetHelp());
@@ -86,6 +83,9 @@ function parseAndSend(senderId, input) {
             sendThis(senderId, messenger.SendPayMe(senderId));
             break;
         case "welcome":
+        case "hey":
+        case "yo":
+            sendText(senderId, msgs.GetWelcome());
         default:
             sendText(senderId, msgs.GetWelcome());
             break;
@@ -95,41 +95,37 @@ function parseAndSend(senderId, input) {
 
 function sendMeme(senderId, getUrlPromise) {
     messenger.SendIsTyping(senderId, true)
-      .then(() => getUrlPromise)
-      .then((url) => {
-        if(urls.IsVideo(url))
-            return messenger.SendVideo(senderId, url);
-        else
-            return messenger.SendImage(senderId, url);
-      })
-      .then(() => messenger.SendIsTyping(senderId, false))
-      .catch((err) => {
-          hlpr.err('Error Bot.SendMeme: ', err);
-          hlpr.log('Sending safe meme');
-          sendSafeMeme(senderId);
-      });
+        .then(() => getUrlPromise)
+        .then((url) => {
+            if(urls.IsVideo(url))
+                return messenger.SendVideo(senderId, url);
+            else
+                return messenger.SendImage(senderId, url);
+        })
+        .then(() => messenger.SendIsTyping(senderId, false))
+        .catch((err) => {
+            hlpr.err('Error Bot.SendMeme: ', err);
+            sendSafeMeme(senderId);
+        });
 }
 
 function sendText(senderId, getTextPromise) {
     messenger.SendIsTyping(senderId, true)
-      .then(() => getTextPromise)
-      .then((textMessage) => messenger.SendText(senderId, textMessage))
-      .then(() => messenger.SendIsTyping(senderId, false))
-      .catch((err) => {
-          hlpr.err('Error Bot.SendText: ', err);
-      });
+        .then(() => getTextPromise)
+        .then((textMessage) => messenger.SendText(senderId, textMessage))
+        .then(() => messenger.SendIsTyping(senderId, false))
+        .catch((err) => hlpr.err('Error Bot.SendText: ', err));
 }
 
 function sendThis(senderId, sendPromise) {
     messenger.SendIsTyping(senderId, true)
-      .then(() => sendPromise)
-      .then(() => messenger.SendIsTyping(senderId, false))
-      .catch((err) => {
-          hlpr.err('Error Bot.SendThis: ', err);
-      });
+        .then(() => sendPromise)
+        .then(() => messenger.SendIsTyping(senderId, false))
+        .catch((err) => hlpr.err('Error Bot.SendThis: ', err));
 }
 
 function sendSafeMeme(senderId) {
+    hlpr.log('Sending safe meme');
     sendThis(senderId, sendMeme(senderId, meme.GetMeme()));
 }
 
@@ -140,13 +136,11 @@ function incrementCommandCounter(label) {
         rp({
             uri: url,
         })
-        .then(() => {
-            resolve(label);
-        })
-        .catch((err) => {
-            hlpr.err('Error Bot.incrementing stats counter: ', err);
-            reject();
-        });
+            .then(() => resolve(label))
+            .catch((err) => {
+                hlpr.err('Error Bot.incrementing stats counter: ', err);
+                resolve();
+            });
     })
 }
 

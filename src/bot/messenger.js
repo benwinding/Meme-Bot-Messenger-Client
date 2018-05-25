@@ -62,42 +62,42 @@ function sendPayMe(recipientId) {
     return new Promise((resolve, reject) => {
         hlpr.log(`--Sending PayMe!!`);
         getUser(recipientId)
-        .then((user) => {
-          let userName = user.first_name;
-          const messageData = {
-              recipient: {
-                  id: recipientId
-              },
-              "message":{
-                "attachment":{
-                  "type":"template",
-                  "payload":{
-                    "template_type":"generic",
-                    "elements":[
-                       {
-                        "title": `Thanks ${userName}, your donation helps`,
-                        "image_url":"https://i.imgur.com/drYGEoT.gif",
-                        "buttons":[
-                          {
-                            "type":"web_url",
-                            "url":"https://messenger-bot-test1.glitch.me/donations/"+userName,
-                            "title":"Donate Now "+userName+"!",
-                            "webview_height_ratio": "tall",
-                            "messenger_extensions": "false",
-                          }              
-                        ]      
-                      }
-                    ]
-                  }
-                },
-                quick_replies: msgs.GetQuickReplies()
-              }
+            .then((user) => {
+                let userName = user.first_name;
+                const messageData = {
+                    recipient: {
+                        id: recipientId
+                    },
+                    "message":{
+                        "attachment":{
+                            "type":"template",
+                            "payload":{
+                                "template_type":"generic",
+                                "elements":[
+                                    {
+                                        "title": `Thanks ${userName}, your donation helps`,
+                                        "image_url":"https://i.imgur.com/drYGEoT.gif",
+                                        "buttons":[
+                                            {
+                                                "type":"web_url",
+                                                "url":"https://messenger-bot-test1.glitch.me/donations/"+userName,
+                                                "title":"Donate Now "+userName+"!",
+                                                "webview_height_ratio": "tall",
+                                                "messenger_extensions": "false",
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        quick_replies: msgs.GetQuickReplies()
+                    }
 
-          }
-          callSendAPI(messageData)
-            .then(resolve)
-            .catch((err) => reject(`--Error sending pay me to messenger API: ${JSON.stringify(err)}`));
-        })
+                };
+                callSendAPI(messageData)
+                    .then(resolve)
+                    .catch((err) => reject(`--Error sending pay me to messenger API: ${JSON.stringify(err)}`));
+            })
     })
 }
 
@@ -120,7 +120,7 @@ function sendIsTyping(recipientId, isTyping) {
 }
 
 function sendText(recipientId, messageText) {
-    if(messageText == null || messageText == "")
+    if(messageText == null || messageText === "")
         messageText = "";
     const messageData = {
         recipient: {
@@ -167,20 +167,20 @@ function getUser(recipientId) {
         rp({
             uri: 'https://graph.facebook.com/v2.6/'+recipientId,
             qs: {
-              fields: "first_name,last_name,profile_pic,locale,timezone,gender",
-              access_token: process.env.PAGE_ACCESS_TOKEN 
+                fields: "first_name,last_name,profile_pic,locale,timezone,gender",
+                access_token: process.env.PAGE_ACCESS_TOKEN
             },
             method: 'GET',
             json: true
         })
-        .then(resolve)
-        .catch((err) => {
-            hlpr.err(`Message failed to getUser from id: ${recipientId}`, err);
-            let blankUser = {
-              first_name: "Mr"
-            }
-            resolve(blankUser);
-        });
+            .then(resolve)
+            .catch((err) => {
+                hlpr.err(`Message failed to getUser from id: ${recipientId}`, err);
+                let blankUser = {
+                    first_name: "Mr"
+                };
+                resolve(blankUser);
+            });
     })
 }
 
@@ -201,7 +201,7 @@ function callSendAPI(messageData) {
 }
 
 function getUserId(recipientId) {
-    if(recipientId == 1300350910054687)
+    if(recipientId === 1300350910054687)
         return "BENNY";
     else
         return recipientId;
@@ -213,6 +213,5 @@ module.exports = {
     SendText: sendText,
     SendVideo: sendVideo,
     SendPayMe: sendPayMe,
-    GetUser: getUser,
     SendIsTyping: sendIsTyping,
 };
