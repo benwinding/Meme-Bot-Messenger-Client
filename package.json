@@ -16,7 +16,7 @@
     "quickstart"
   ],
   "engines": {
-    "node": "6.x"
+    "node": "8.x"
   },
   "author": "Mikhail Larionov <mlarionov@fb.com>",
   "license": "MIT",

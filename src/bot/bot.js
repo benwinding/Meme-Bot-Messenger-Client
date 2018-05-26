@@ -29,81 +29,59 @@ function handlePostBackRecieved(senderId, postback) {
     parseAndSend(senderId, input);
 }
 
+let commands = [];
+let defaultCommand;
+function addCommand(command, aliases, callback, isdefault) {
+    const newCommand = {
+        name: command,
+        aliases: aliases,
+        action: callback,
+    };
+    commands.push(newCommand);
+    if (isdefault)
+        defaultCommand = newCommand;
+}
+
+addCommand("meme", ["good", "send memes", "memes", "meme"],
+    (senderId) => sendMeme(senderId, meme.GetMeme()) );
+addCommand("dank", ["lol"],
+    (senderId) => sendMeme(senderId, meme.GetImgurSubreddit("dankmemes")) );
+addCommand("hot", ["yas"],
+    (senderId) => sendMeme(senderId, meme.GetHot()) );
+addCommand("xxx", ["wild"],
+    (senderId) => sendMeme(senderId, meme.GetImgurSubreddit("SFWPornGifs")) );
+addCommand("mild", [],
+    (senderId) => sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting")) );
+addCommand("random", [],
+    (senderId) => sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting")) );
+addCommand("memecon", [ "memeeconomy",  "memeecon"],
+    (senderId) => sendMeme(senderId, meme.GetImgurSubreddit("MemeEconomy")) );
+addCommand("why", ["fuck", "fuck you"],
+    (senderId) => sendText(senderId, msgs.GetWhy()) );
+addCommand("how", ["wtf"],
+    (senderId) => sendText(senderId, msgs.GetHow()) );
+addCommand("share", ["share me"],
+    (senderId) => sendThis(senderId, messenger.SendShareMe(senderId)) );
+addCommand("help", ["help me"],
+    (senderId) => sendText(senderId, msgs.GetHelp()) );
+addCommand("donate", ["pay me"],
+    (senderId) => sendThis(senderId, messenger.SendPayMe(senderId)) );
+addCommand("welcome", [],
+    (senderId) => sendText(senderId, msgs.GetWelcome()), true );
+
 function parseAndSend(senderId, input) {
     if(!input)
         input = "";
-    let command = input.toLowerCase();
-    let parsed = "welcome";
-    switch(command) {
-        case "good":
-        case "send memes":
-        case "memes":
-        case "meme":
-            parsed = "meme";
-            sendMeme(senderId, meme.GetMeme());
-            break;
-        case "dank":
-            parsed = "dank";
-            sendMeme(senderId, meme.GetImgurSubreddit("dankmemes"));
-            break;
-        case "hot":
-            parsed = "hot";
-            sendMeme(senderId, meme.GetHot());
-            break;
-        case "wild":
-        case "xxx":
-            parsed = "xxx";
-            sendMeme(senderId, meme.GetImgurSubreddit("SFWPornGifs"));
-            break;
-        case "mild":
-            parsed = "mild";
-            sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
-            break;
-        case "random":
-            parsed = "random";
-            sendMeme(senderId, meme.GetImgurSubreddit("mildlyinteresting"));
-            break;
-        case "MemEcon":
-        case "MemeEconomy":
-        case "memecon":
-            parsed = "memecon";
-            sendMeme(senderId, meme.GetImgurSubreddit("MemeEconomy"));
-            break;
-        case "fuck":
-        case "fuck you":
-        case "why":
-            parsed = "why";
-            sendText(senderId, msgs.GetWhy());
-            break;
-        case "how":
-            parsed = "how";
-            sendText(senderId, msgs.GetHow());
-            break;
-        case "share me":
-        case "share":
-            parsed = "share";
-            sendThis(senderId, messenger.SendShareMe(senderId));
-            break;
-        case "help":
-        case "help me":
-            sendText(senderId, msgs.GetHelp());
-            break;
-        case "pay me":
-        case "donate":
-            parsed = "donate";
-            sendThis(senderId, messenger.SendPayMe(senderId));
-            break;
-        case "hey":
-        case "yo":
-        case "welcome":
-            parsed = "welcome";
-            sendText(senderId, msgs.GetWelcome());
-            break;
-        default:
-            sendText(senderId, msgs.GetWelcome());
-            break;
+    let inputCommand = input.toLowerCase();
+    for (const command of commands) {
+        if (command.name === inputCommand || command.aliases.includes(inputCommand)) {
+            command.action(senderId);
+            incrementCommandCounter(command.name);
+            return;
+        }
     }
-    incrementCommandCounter(parsed);
+    defaultCommand.action(senderId);
+    incrementCommandCounter(defaultCommand.name);
 }
 
 function sendMeme(senderId, getUrlPromise) {
