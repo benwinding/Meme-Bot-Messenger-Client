@@ -9,66 +9,13 @@ html
     link(href='/donations.css', type='text/css', rel='stylesheet')
   body
     .container
-      .col-md-6.center-block(style='text-align: center; width: 100%;')
+      .col-md-6.center-block(style='display: flex; width: 100%; flex-direction: column; align-items: center; text-align: center')
         h2= "Donate now " + firstName + "!"
-        h4 Help the developer create new features with a cup of coffee
-        img(style='max-width: 200px; width: 100%;', src='https://i.imgur.com/xjzTjiF.gif')
-    form#payment-form(action='/charged', method='post')
-      .form-row
-        label(for='card-element')
-          | Credit or debit card
-        #card-element
-          // A Stripe Element will be inserted here.
-        // Used to display form errors.
-        #card-errors(role='alert')
-      button Submit $3
-    script.
-      var stripeKey = "#{STRIPE_API_KEY}";
-      var stripe = Stripe(stripeKey);
-      // Create an instance of Elements.
-      var elements = stripe.elements();
-      // Create an instance of the card Element.
-      var card = elements.create('card');
-      // Add an instance of the card Element into the `card-element` <div>.
-      card.mount('#card-element');
-
-      // Handle real-time validation errors from the card Element.
-      card.addEventListener('change', function(event) {
-          var displayError = document.getElementById('card-errors');
-          if (event.error) {
-              displayError.textContent = event.error.message;
-          } else {
-              displayError.textContent = '';
-          }
-      });
-
-      // Handle form submission.
-      var form = document.getElementById('payment-form');
-      form.addEventListener('submit', function(event) {
-          event.preventDefault();
-
-          stripe.createToken(card).then(function(result) {
-              if (result.error) {
-                  // Inform the user if there was an error.
-                  var errorElement = document.getElementById('card-errors');
-                  errorElement.textContent = result.error.message;
-              } else {
-                  // Send the token to your server.
-                  stripeTokenHandler(result.token);
-              }
-          });
-      });
-
-      function stripeTokenHandler(token) {
-        // Insert the token ID into the form so it gets submitted to the server
-        var form = document.getElementById('payment-form');
-        var hiddenInput = document.createElement('input');
-        hiddenInput.setAttribute('type', 'hidden');
-        hiddenInput.setAttribute('name', 'stripeToken');
-        hiddenInput.setAttribute('value', token.id);
-        form.appendChild(hiddenInput);
-
-        // Submit the form
-        form.submit();
-      }
-
+        h4 Thanks for caring enough to click that button ❤️
+        div(style="position: relative;")
+          a(href='https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ben.winding%40gmail.com&item_name=Development&currency_code=AUD&source=url' rel='nofollow')
+            strong#over= firstName
+            img(style='max-width: 200px; width: 100%;', src='https://i.imgur.com/wj2nddm.png')
+        h4 But, will you click this button ⬇️
+        a(href='https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=ben.winding%40gmail.com&item_name=Development&currency_code=AUD&source=url' rel='nofollow')
+          img(src='https://camo.githubusercontent.com/f896f7d176663a1559376bb56aac4bdbbbe85ed1/68747470733a2f2f7777772e70617970616c6f626a656374732e636f6d2f656e5f55532f692f62746e2f62746e5f646f6e61746543435f4c472e676966' alt='paypal' data-canonical-src='https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif' style='max-width:100%;')
