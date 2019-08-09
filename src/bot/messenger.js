@@ -76,11 +76,11 @@ function sendPayMe(recipientId) {
                                 "elements":[
                                     {
                                         "title": `Thanks ${userName}, your donation helps`,
-                                        "image_url":"https://i.imgur.com/drYGEoT.gif",
+                                        "image_url":"https://memebot.lappr.com.au/button.jpg",
                                         "buttons":[
                                             {
                                                 "type":"web_url",
-                                                "url":"https://messenger-bot-test1.glitch.me/donations/"+userName,
+                                                "url":"https://memebot.lappr.com.au/donations/"+userName,
                                                 "title":"Donate Now "+userName+"!",
                                                 "webview_height_ratio": "tall",
                                                 "messenger_extensions": "false",
