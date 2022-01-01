@@ -10,6 +10,6 @@ curl -X POST -F whitelisted_domains='[
     "https://payments-memebot.herokuapp.com/", 
     "https://example.com/", 
     "https://glitch.me/", 
-    "https://memebot.lappr.com.au",
+    "https://memebot.winding.app",
     "https://messenger-bot-test1.glitch.me/"
   ]' "https://graph.facebook.com/v4.0/me/messenger_profile?fields=whitelisted_domains&access_token=$PAGE_TOKEN"
