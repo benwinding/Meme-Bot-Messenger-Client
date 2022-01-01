@@ -4,10 +4,9 @@
   "description": "Messenger Platform QuickStart Demo",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server.js"
-  },
-  "engines": {
-    "node": "8.x"
+    "start": "node src/server.js",
+    "deploy": "git push dokku",
+    "deploy-staging": "git push dokku-staging"
   },
   "author": "Mikhail Larionov <mlarionov@fb.com>",
   "license": "MIT",
