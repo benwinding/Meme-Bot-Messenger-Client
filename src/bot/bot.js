@@ -123,16 +123,16 @@ function sendSafeMeme(senderId) {
 function incrementCommandCounter(label) {
     hlpr.log('Incrementing counter: ' + label);
     const url = 'https://butter-goal.glitch.me/increment/' + label;
-    return new Promise((resolve, reject) => {
-        rp({
-            uri: url,
-        })
-            .then(() => resolve(label))
-            .catch((err) => {
-                hlpr.err('Error Bot.incrementing stats counter: ', err);
-                resolve();
-            });
-    })
+    // return new Promise((resolve, reject) => {
+    //     rp({
+    //         uri: url,
+    //     })
+    //         .then(() => resolve(label))
+    //         .catch((err) => {
+    //             hlpr.err('Error Bot.incrementing stats counter: ', err);
+    //             resolve();
+    //         });
+    // })
 }
 
 module.exports = {
